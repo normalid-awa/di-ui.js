@@ -1,0 +1,31 @@
+{
+	"name": "di-ui.js",
+	"version": "1.0.0",
+	"description": "",
+	"type": "module",
+	"files": [
+		"dist"
+	],
+	"main": "dist/di-ui.mjs",
+	"module": "dist/di-ui.umd.cjs",
+	"exports": {
+		".": {
+			"import": "./dist/di-ui.mjs",
+			"require": "./dist/di-ui.umd.cjs"
+		}
+	},
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"dev": "vite",
+		"preview": "vite preview",
+		"build": "vite build"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"devDependencies": {
+		"typescript": "^5.5.4",
+		"vite": "^5.3.5",
+		"vite-plugin-dts": "^4.0.0-beta.2"
+	}
+}
