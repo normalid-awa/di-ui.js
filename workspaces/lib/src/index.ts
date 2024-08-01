@@ -1,6 +1,3 @@
-export function Hello() {
-	// return "This is the start of a new era";
-	return
+export function Hello(): string {
+	return "This is the start of a new era";
 }
-
-const a = 1 as number;

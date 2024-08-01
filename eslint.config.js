@@ -1,12 +1,24 @@
-const eslint = require("@eslint/js");
-const tseslint = require("typescript-eslint");
+// @ts-check
+/* eslint-env node */
 
-module.export = {
-	...tseslint.config(eslint.configs.recommended, ...tseslint.configs.strict, {
+import eslint from "@eslint/js";
+import tseslint, { parser, plugin } from "typescript-eslint";
+
+export default [
+	// eslint.configs.recommended,
+	// tseslint.configs.strict,
+	{
+		files: ["**/*.ts"],
 		languageOptions: {
+			parser: parser,
 			parserOptions: {
-				tsconfigRootDir: __dirname,
-			}
+				project: ["tsconfig.json"],
+				// @ts-ignore
+				tsconfigRootDir: import.meta.dirname,
+			},
+		},
+		plugins: {
+			"@typescript-eslint": plugin,
 		},
 		ignores: ["node_modules/**", "dist/**"],
 		rules: {
@@ -92,7 +104,6 @@ module.export = {
 			"@typescript-eslint/no-non-null-asserted-nullish-coalescing":
 				"error",
 			"@typescript-eslint/no-non-null-asserted-optional-chain": "error",
-			"@typescript-eslint/no-non-null-assertion": "error",
 			"@typescript-eslint/no-redundant-type-constituents": "error",
 			"@typescript-eslint/no-unnecessary-boolean-literal-compare":
 				"error",
@@ -127,5 +138,5 @@ module.export = {
 			"@typescript-eslint/require-array-sort-compare": "error",
 			"@typescript-eslint/strict-boolean-expressions": "warn",
 		},
-	}),
-};
+	},
+];
