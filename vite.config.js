@@ -1,13 +1,13 @@
 import { defineConfig } from 'vite';
 import dts from "vite-plugin-dts";
 
-const lib_name = "di-ui";
+const LIB_NAME = "di-ui";
 
 export default defineConfig({
 	build: {
 		lib: {
 			entry: "lib/index.ts",
-			name: lib_name,
+			name: LIB_NAME,
 			formats: ['cjs','es','umd'],
 			fileName: "index",
 		},

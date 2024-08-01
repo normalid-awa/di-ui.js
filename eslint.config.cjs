@@ -1,24 +1,17 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-import eslint from "@eslint/js";
-import tseslint from "typescript-eslint";
-import { FlatCompat } from "@eslint/eslintrc";
+const eslint = require("@eslint/js");
+const tseslint = require("typescript-eslint");
+const { FlatCompat } = require("@eslint/eslintrc");
+const path = require("path");
 
-// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 const COMPAT = new FlatCompat({
 	baseDirectory: ".",
 });
 
-export default tseslint.config(
+module.export = tseslint.config(
 	eslint.configs.recommended,
 	...tseslint.configs.strict,
-	// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-	...COMPAT.config({
-		parserOptions: {
-			project: "./tsconfig.json",
-		},
-	}),
 	{
-		ignores: ["**/node_modules/**", "dist"],
+		ignores: ["**/node_modules/**", "dist/**"],
 		rules: {
 			"@typescript-eslint/naming-convention": [
 				"error",
@@ -136,7 +129,11 @@ export default tseslint.config(
 			"@typescript-eslint/prefer-string-starts-ends-with": "error",
 			"@typescript-eslint/require-array-sort-compare": "error",
 			"@typescript-eslint/strict-boolean-expressions": "warn",
-			 
 		},
-	}
+	},
+	...COMPAT.config({
+		parserOptions: {
+			project: path.join(__dirname, "./tsconfig.json"),
+		},
+	})
 );
