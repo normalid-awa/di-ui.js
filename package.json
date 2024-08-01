@@ -1,29 +1,15 @@
 {
-	"name": "di-ui.js",
+	"name": "@di-ui.js/monorepo",
+	"author": "normalid",
 	"version": "1.0.0",
-	"description": "",
 	"type": "module",
-	"files": [
-		"dist"
+	"workspaces": [
+		"workspaces/lib",
+		"workspaces/example-app"
 	],
-	"main": "dist/di-ui.mjs",
-	"module": "dist/di-ui.umd.cjs",
-	"exports": {
-		".": {
-			"import": "./dist/di-ui.mjs",
-			"require": "./dist/di-ui.umd.cjs"
-		}
-	},
 	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1",
-		"lint": "eslint .",
-		"dev": "vite",
-		"preview": "vite preview",
-		"build": "vite build"
+		"lint": "eslint ."
 	},
-	"keywords": [],
-	"author": "",
-	"license": "ISC",
 	"devDependencies": {
 		"@eslint/eslintrc": "^3.1.0",
 		"@eslint/js": "^9.8.0",

@@ -1,17 +1,14 @@
 const eslint = require("@eslint/js");
 const tseslint = require("typescript-eslint");
-const { FlatCompat } = require("@eslint/eslintrc");
-const path = require("path");
 
-const COMPAT = new FlatCompat({
-	baseDirectory: ".",
-});
-
-module.export = tseslint.config(
-	eslint.configs.recommended,
-	...tseslint.configs.strict,
-	{
-		ignores: ["**/node_modules/**", "dist/**"],
+module.export = {
+	...tseslint.config(eslint.configs.recommended, ...tseslint.configs.strict, {
+		languageOptions: {
+			parserOptions: {
+				tsconfigRootDir: __dirname,
+			}
+		},
+		ignores: ["node_modules/**", "dist/**"],
 		rules: {
 			"@typescript-eslint/naming-convention": [
 				"error",
@@ -130,10 +127,5 @@ module.export = tseslint.config(
 			"@typescript-eslint/require-array-sort-compare": "error",
 			"@typescript-eslint/strict-boolean-expressions": "warn",
 		},
-	},
-	...COMPAT.config({
-		parserOptions: {
-			project: path.join(__dirname, "./tsconfig.json"),
-		},
-	})
-);
+	}),
+};
