@@ -20,9 +20,6 @@ export namespace Composite {
 
 		public Children: IComposable[];
 
-		/**
-		 *
-		 */
 		constructor() {
 			this.Children = [];
 			this.Parent = undefined;
