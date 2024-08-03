@@ -9,11 +9,11 @@ class DivContainer extends Di.Components.DrawableComponent {
 	override ComponentName: string = "DivContainer";
 }
 
-abstract class WordContainer extends DivContainer {
+class WordContainer extends DivContainer {
 	override ComponentName: string = "WordContainer";
 	protected override ElementTag: keyof HTMLElementTagNameMap = "span";
 
-	protected abstract readonly DisplayText: string;
+	protected readonly DisplayText!: string;
 
 	override Render(): Element {
 		super.Render();
@@ -24,12 +24,12 @@ abstract class WordContainer extends DivContainer {
 
 class FirstWordContainer extends WordContainer {
 	@Di.DependencyInjection.Resolved(FirstWordDependency)
-	protected override readonly DisplayText!: string;
+	protected override readonly DisplayText: string = "";
 }
 
 class SecondWordContainer extends WordContainer {
 	@Di.DependencyInjection.Resolved(SecondWordDependency)
-	protected override readonly DisplayText!: string;
+	protected override readonly DisplayText: string = "";
 }
 
 const Root = new DivContainer();
