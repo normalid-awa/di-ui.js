@@ -2,7 +2,7 @@
 	"name": "@di-ui.js/monorepo",
 	"private": true,
 	"author": "normalid",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "The new era of front-end framework",
 	"homepage": "https://github.com/normalid-awa/di-ui.js",
 	"type": "module",
