@@ -1,7 +1,12 @@
-/* eslint-disable*/
+import "reflect-metadata";
 import * as Di from "di-ui.js";
 
 class DivContainer extends Di.Components.DrawableComponent {
+
+	// The container would be inject the value of `FirstWorld`
+	@Di.DependencyInjection.Resolved("FirstWorld")
+	private readonly theWordThatInjectedToThisVar: string = "placeholder";
+
 	constructor(name: string = "DivContainer") {
 		super();
 		this.ComponentName = name;
@@ -11,7 +16,9 @@ class DivContainer extends Di.Components.DrawableComponent {
 		super.Render();
 		this.CurrentElement!.id = this.ComponentName;
 		this.CurrentElement!.prepend(
-			document.createTextNode(this.ComponentName)
+			document.createTextNode(
+				`${this.ComponentName} - ${this.theWordThatInjectedToThisVar}`
+			)
 		);
 		return this.CurrentElement!;
 	}
@@ -30,7 +37,9 @@ HELLO.SetAttribute("style", "color: blue;")
 	.Add(new DivContainer("!!!"));
 ROOT.Add(HELLO);
 
-const DEPENDENCY_CONTAINER = new Di.DependencyInjection.DependencyContainer();
+const DEPENDENCY_CONTAINER = new Di.DependencyInjection.DependencyContainer(
+	ROOT
+);
 
 DEPENDENCY_CONTAINER.Provide(
 	Di.DependencyInjection.ProvidedType.Value,
