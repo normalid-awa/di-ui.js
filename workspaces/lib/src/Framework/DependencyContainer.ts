@@ -19,13 +19,7 @@ export namespace DependencyContainer {
 			type: ProvidedType,
 			key: string,
 			value: object
-		): IDependencyContainer;
-
-		Provide<T>(
-			type: ProvidedType.Singleton,
-			key: string,
-			value: object
-		): IDependencyContainer;
+		): this;
 
 		Get<T>(key: string): T;
 	}
@@ -37,7 +31,7 @@ export namespace DependencyContainer {
 			type: ProvidedType,
 			key: string,
 			value: T | object
-		): IDependencyContainer {
+		): this {
 			switch (type) {
 				case ProvidedType.Class:
 					this.dependencies.set(key, value);
