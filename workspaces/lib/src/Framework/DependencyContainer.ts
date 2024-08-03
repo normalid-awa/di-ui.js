@@ -1,4 +1,4 @@
-export namespace DependencyContainer {
+export namespace DependencyInjection {
 	export enum ProvidedType {
 		/**
 		 * Includes literals, instances of classes, and functions
