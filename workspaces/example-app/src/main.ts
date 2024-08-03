@@ -4,7 +4,6 @@ import * as Di from "di-ui.js";
 
 const FirstWordDependency: unique symbol = Symbol("FirstWordDependency");
 const SecondWordDependency: unique symbol = Symbol("SecondWordDependency");
-const ThirdWordDependency: unique symbol = Symbol("ThirdWordDependency");
 
 abstract class Container extends Di.Components.DrawableComponent {
 	protected override ElementTag: keyof HTMLElementTagNameMap = "div";
@@ -50,11 +49,6 @@ class SecondWordContainer extends WordContainer {
 	protected override readonly DisplayText!: string;
 }
 
-class ShownLaterThirdWordContainer extends WordContainer {
-	@Di.DependencyInjection.Resolved(ThirdWordDependency)
-	protected override readonly DisplayText!: string;
-}
-
 const Root = new DivContainer();
 
 /**
@@ -72,9 +66,8 @@ const DependencyContainer = new Di.DependencyInjection.DependencyContainer(
 );
 
 DependencyContainer
-	.Provide(Di.DependencyInjection.ProvidedType.Value, FirstWordDependency, "This is the ")
-	.Provide(Di.DependencyInjection.ProvidedType.Value, SecondWordDependency, ",New era of front-end development!!!")
-	.Provide(Di.DependencyInjection.ProvidedType.Value, ThirdWordDependency, "Dependency injection is awesome!!");
+	.Provide(Di.DependencyInjection.ProvidedType.Value, FirstWordDependency, "Hello ")
+	.Provide(Di.DependencyInjection.ProvidedType.Value, SecondWordDependency, ",World!");
 
 const App = new Di.App.SpaAppEntry(DependencyContainer, Root);
 
@@ -84,11 +77,6 @@ const Framework = new Di.Framework.Framework(
 );
 
 Framework.Start();
-
-setTimeout(() => {
-	//TODO: Reactive update will be implement later in the framework
-	Root.Add(new ShownLaterThirdWordContainer());
-}, 1000)
 
 setTimeout(() => {
 	Root.Dispose();
