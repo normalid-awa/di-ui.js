@@ -139,7 +139,7 @@ export default [
 			"@typescript-eslint/prefer-for-of": "warn",
 			"@typescript-eslint/prefer-function-type": "warn",
 			"@typescript-eslint/prefer-includes": "error",
-			"@typescript-eslint/prefer-namespace-keyword": "error",
+			// "@typescript-eslint/prefer-namespace-keyword": "error",
 			"@typescript-eslint/prefer-optional-chain": "error",
 			"@typescript-eslint/prefer-readonly": "warn",
 			//NOTES: Having bug with using interface method

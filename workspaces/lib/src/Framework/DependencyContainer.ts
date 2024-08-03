@@ -2,7 +2,7 @@ import "reflect-metadata";
 import { MetadataKeys } from "./Metadata";
 import { Composite } from "../Composite";
 
-export namespace DependencyInjection {
+export module DependencyInjection {
 	export enum ProvidedType {
 		/**
 		 * Includes literals, instances of classes, and functions

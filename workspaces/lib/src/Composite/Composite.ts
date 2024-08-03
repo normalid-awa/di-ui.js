@@ -1,4 +1,4 @@
-export namespace Composite {
+export module Composite {
 	export class ComponentNotFound extends Error {
 		constructor(name: string) {
 			super(`Component ${name} not found`);

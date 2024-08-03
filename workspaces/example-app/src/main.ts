@@ -1,6 +1,6 @@
 /* eslint-disable */
 import "reflect-metadata";
-import * as Di from "di-ui.js";
+import Di from "di-ui.js";
 
 const FirstWordDependency: unique symbol = Symbol("FirstWordDependency");
 const SecondWordDependency: unique symbol = Symbol("SecondWordDependency");

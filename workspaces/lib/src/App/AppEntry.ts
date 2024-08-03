@@ -1,7 +1,7 @@
 import { Components } from "../Components";
 import { DependencyInjection } from "../Framework";
 
-export namespace App {
+export module App {
 	export abstract class AppEntry implements Components.IDrawable {
 		Presented: boolean = false;
 		public ComponentName: string = "App";

@@ -1,7 +1,7 @@
 import { App } from "../App";
 import { DependencyInjection } from "./DependencyContainer";
 
-export namespace Framework {
+export module Framework {
 	export type HTMLString = string;
 
 	export class Framework {
@@ -9,14 +9,11 @@ export namespace Framework {
 		private readonly root: Element;
 
 		/**
-		 * 
+		 *
 		 * @param app The app entry point, could be SPA or MPA or Custom
 		 * @param pageRoot The root element of the page, mostly is ```document.getElementById("app")```
 		 */
-		constructor(
-			app: App.AppEntry,
-			pageRoot: Element,
-		) {
+		constructor(app: App.AppEntry, pageRoot: Element) {
 			this.appEntry = app;
 			this.root = pageRoot;
 		}

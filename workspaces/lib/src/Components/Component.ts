@@ -1,8 +1,9 @@
+// import { Composite } from "../Composite";
 import { Composite } from "../Composite";
 import { DependencyInjection } from "../Framework";
 import { HTMLTags } from "../types";
 
-export namespace Components {
+export module Components {
 	export abstract class CompositeComponent
 		extends Composite.Composite
 		implements Composite.IComposable, DependencyInjection.IInjectable
