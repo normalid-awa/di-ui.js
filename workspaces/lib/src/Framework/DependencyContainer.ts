@@ -80,16 +80,12 @@ export namespace DependencyInjection {
 			return flat_map;
 		}
 
-		Provide<T>(type: ProvidedType, key: string, value: T | object): this {
+		Provide<T>(type: ProvidedType, key: string | symbol, value: T | object): this {
 			switch (type) {
 				case ProvidedType.Class:
-					this.dependencies.set(key, value);
-					break;
 				case ProvidedType.Singleton:
-					this.dependencies.set(key, value);
-					break;
 				case ProvidedType.Value:
-					this.dependencies.set(key, value);
+					this.dependencies.set(key.toString(), value);
 					break;
 			}
 
@@ -121,11 +117,11 @@ export namespace DependencyInjection {
 		propertyKey: string;
 	}
 
-	export function Resolved(injectKey: string): PropertyDecorator {
+	export function Resolved(injectKey: string | symbol): PropertyDecorator {
 		return (target: Object, propertyKey: string | symbol) => {
 			void Reflect.defineMetadata(
 				MetadataKeys.InjectableProperty,
-				injectKey,
+				injectKey.toString(),
 				target,
 				propertyKey
 			);
