@@ -12,6 +12,20 @@
 		"url": "https://github.com/normalid-awa/di-ui.js/issues",
 		"email": "rluo2018@gmail.com"
 	},
+	"readme": "README.md",
+	"keywords": [
+		"front-end",
+		"framework",
+		"typescript",
+		"js",
+		"dom",
+		"dependency injection",
+		"di",
+		"ioc",
+		"composite",
+		"light-weight",
+		"fast"
+	],
 	"license": "MIT",
 	"type": "module",
 	"files": [
