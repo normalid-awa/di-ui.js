@@ -12,7 +12,6 @@ export namespace Components {
 
 	export interface IDrawable {
 		readonly ComponentName: string;
-		Presented: boolean;
 		Render(): Element;
 	}
 
@@ -20,7 +19,6 @@ export namespace Components {
 		extends CompositeComponent
 		implements IDrawable
 	{
-		public Presented: boolean = false;
 		public abstract ComponentName: string;
 		protected abstract readonly ElementTag: NoInfer<HTMLTags>;
 		protected readonly ElementAttributes: Map<string, string> = new Map();
@@ -42,19 +40,6 @@ export namespace Components {
 			return this.CurrentElement;
 		}
 
-		override Add(
-			item: Composite.IComposable | Composite.IComposable[]
-		): this {
-			super.Add(item);
-			return this;
-		}
-
-		override Remove(
-			item: Composite.IComposable | Composite.IComposable[]
-		): void {
-			super.Remove(item);
-		}
-
 		override Dispose(): void {
 			super.Dispose();
 
@@ -66,6 +51,7 @@ export namespace Components {
 
 		public SetAttribute(key: string, value: string): this {
 			this.ElementAttributes.set(key, value);
+
 			return this;
 		}
 	}
