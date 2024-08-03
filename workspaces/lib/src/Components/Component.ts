@@ -9,20 +9,12 @@ export namespace Components {
 		public LoadComplete(): void {}
 	}
 
-	export interface IDrawable {
-		readonly ComponentName: string;
-		Render(): Element;
-	}
-
-	export abstract class DrawableComponent
-		extends CompositeComponent
-		implements IDrawable
-	{
-		public abstract ComponentName: string;
-		protected abstract readonly ElementTag: keyof HTMLElementTagNameMap;
+	export abstract class DrawableComponent extends CompositeComponent {
+		public ComponentName: string = "DrawableComponent";
+		protected readonly ElementTag: keyof HTMLElementTagNameMap = "div";
 		protected readonly ElementAttributes: Map<string, string> = new Map();
 
-		protected abstract CurrentElement?: Element;
+		protected CurrentElement?: Element;
 
 		public Render(): Element {
 			this.CurrentElement = document.createElement(this.ElementTag);
@@ -30,12 +22,12 @@ export namespace Components {
 			this.ElementAttributes.forEach((value, key) => {
 				this.CurrentElement!.setAttribute(key, value);
 			});
-
+			
 			this.Children.forEach((child) => {
 				if (child instanceof DrawableComponent)
 					this.CurrentElement!.appendChild(child.Render());
 			});
-
+			
 			return this.CurrentElement;
 		}
 
