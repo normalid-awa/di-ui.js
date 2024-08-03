@@ -39,26 +39,32 @@ export namespace DependencyInjection {
 				this.injectTargetRoot.Children
 			);
 
-			for (const child of flat_children) {
-				const own_keys = Object.getOwnPropertyNames(child);
-				for (const property_key of own_keys) {
-					if (
-						Reflect.hasMetadata(
-							MetadataKeys.InjectableProperty,
-							child,
-							property_key
+			flat_children.forEach((child) => {
+				const injectable_properties = Object.keys(child)
+					.map((propertyKey) => {
+						if (
+							Reflect.hasMetadata(
+								MetadataKeys.InjectableProperty,
+								child,
+								propertyKey
+							)
 						)
-					) {
-						const inject_key: string = Reflect.getMetadata(
-							MetadataKeys.InjectableProperty,
-							child,
-							property_key
-						) as string;
-						(child as Record<string, any>)[property_key] =
-							this.dependencies.get(inject_key) as unknown;
-					}
-				}
-			}
+							return propertyKey;
+						return undefined;
+					})
+					.filter((value) => value !== undefined);
+
+				injectable_properties.forEach((propertyKey) => {
+					const inject_key: string = Reflect.getMetadata(
+						MetadataKeys.InjectableProperty,
+						child,
+						propertyKey
+					) as string;
+
+					(child as Record<string, any>)[propertyKey] =
+						this.dependencies.get(inject_key) as unknown;
+				});
+			});
 		}
 
 		private extractAllChildrenIntoFlatMap(
@@ -74,11 +80,7 @@ export namespace DependencyInjection {
 			return flat_map;
 		}
 
-		Provide<T>(
-			type: ProvidedType,
-			key: string | symbol,
-			value: T | object
-		): this {
+		Provide<T>(type: ProvidedType, key: string | symbol, value: T | object): this {
 			switch (type) {
 				case ProvidedType.Class:
 				case ProvidedType.Singleton:
