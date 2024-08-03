@@ -1,6 +1,5 @@
 import { Composite } from "../Composite";
 import { DependencyInjection } from "../Framework";
-import { HTMLTags } from "../types";
 
 export namespace Components {
 	export abstract class CompositeComponent
@@ -20,7 +19,7 @@ export namespace Components {
 		implements IDrawable
 	{
 		public abstract ComponentName: string;
-		protected abstract readonly ElementTag: NoInfer<HTMLTags>;
+		protected abstract readonly ElementTag: keyof HTMLElementTagNameMap;
 		protected readonly ElementAttributes: Map<string, string> = new Map();
 
 		protected abstract CurrentElement?: Element;
