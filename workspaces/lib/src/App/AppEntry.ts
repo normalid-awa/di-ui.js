@@ -6,8 +6,8 @@ export namespace App {
 		protected abstract RootContainer: Components.DrawableComponent;
 		protected Container: DependencyInjection.IDependencyContainer;
 
-		constructor(diContainer: DependencyInjection.IDependencyContainer) {
-			this.Container = diContainer;
+		constructor(container: DependencyInjection.IDependencyContainer) {
+			this.Container = container;
 		}
 
 		public abstract Render(): Element;
@@ -16,8 +16,8 @@ export namespace App {
 	export class SpaAppEntry extends AppEntry {
 		protected override RootContainer: Components.DrawableComponent;
 
-		public constructor(diContainer: DependencyInjection.IDependencyContainer, root: Components.DrawableComponent) {
-			super(diContainer);
+		public constructor(container: DependencyInjection.IDependencyContainer, root: Components.DrawableComponent) {
+			super(container);
 			this.RootContainer = root;
 		}
 
