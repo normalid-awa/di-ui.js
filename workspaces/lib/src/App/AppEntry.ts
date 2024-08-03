@@ -22,7 +22,6 @@ export namespace App {
 		}
 
 		Render(): Element {
-			this.Container.ResolveRoot();
 			return this.RootContainer.Render();
 		}
 	}
