@@ -6,36 +6,12 @@ export namespace Composite {
 	}
 
 	export interface IComposable {
-		/**
-		 * The parent of this component, undefined means it's the root
-		 */
 		Parent: IComposable | undefined;
-
-		/**
-		 * Contains all child components
-		 */
 		Children: IComposable[];
 
-		/**
-		 * Add a new child or children to the component
-		 * @param item
-		 */
 		Add(item: IComposable | IComposable[]): this;
-
-		/**
-		 * Remove a child or children from the component
-		 * @param item
-		 */
 		Remove(item: IComposable | IComposable[]): void;
-
-		/**
-		 * Detach the component from its parent
-		 */
 		Detach(): void;
-
-		/**
-		 * Dispose this component and all its children
-		 */
 		Dispose(): void;
 	}
 

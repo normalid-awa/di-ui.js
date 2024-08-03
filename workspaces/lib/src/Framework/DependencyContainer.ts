@@ -19,23 +19,10 @@ export namespace DependencyInjection {
 	}
 
 	export interface IDependencyContainer {
-		/**
-		 * Provide a value to the container, which can be injected
-		 * @param type Determines the type of injection
-		 * @param key The key to inject
-		 * @param value The value to inject
-		 */
-		Provide<T>(type: ProvidedType, key: string | symbol, value: object): this;
+		Provide<T>(type: ProvidedType, key: string, value: object): this;
 
-		/**
-		 * retrieve the value from the container
-		 * @param key The key to get
-		 */
-		Get<T>(key: string | symbol): T;
+		Get<T>(key: string): T;
 
-		/**
-		 * Inject dependencies to the children
-		 */
 		ResolveRoot(): void;
 	}
 
@@ -68,7 +55,7 @@ export namespace DependencyInjection {
 							property_key
 						) as string;
 						(child as Record<string, any>)[property_key] =
-							this.Get(inject_key) as unknown;
+							this.dependencies.get(inject_key) as unknown;
 					}
 				}
 			}
