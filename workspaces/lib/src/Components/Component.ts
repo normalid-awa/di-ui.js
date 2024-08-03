@@ -1,10 +1,10 @@
 import { Composite } from "../Composite";
-import { DependencyInjection } from "../Framework";
+import { DependencyContainer } from "../Framework";
 
 export namespace Components {
 	export abstract class CompositeComponent
 		extends Composite.Composite
-		implements Composite.IComposable, DependencyInjection.IInjectable
+		implements Composite.IComposable, DependencyContainer.IInjectable
 	{
 		public LoadComplete(): void {}
 	}

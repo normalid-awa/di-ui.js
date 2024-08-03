@@ -1,5 +1,4 @@
 import { App } from "../App";
-import { DependencyInjection } from "./DependencyContainer";
 
 export namespace Framework {
 	export type HTMLString = string;
@@ -8,11 +7,7 @@ export namespace Framework {
 		private readonly appEntry: App.AppEntry;
 		private readonly root: Element;
 
-
-		constructor(
-			app: App.AppEntry,
-			pageRoot: Element,
-		) {
+		constructor(app: App.AppEntry, pageRoot: Element) {
 			this.appEntry = app;
 			this.root = pageRoot;
 		}
