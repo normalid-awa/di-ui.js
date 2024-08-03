@@ -1,67 +1,61 @@
-/* eslint-disable */
 import "reflect-metadata";
 import * as Di from "di-ui.js";
 
-const FirstWordDependency: unique symbol = Symbol("FirstWordDependency");
-const SecondWordDependency: unique symbol = Symbol("SecondWordDependency");
-
 class DivContainer extends Di.Components.DrawableComponent {
-	override ComponentName: string = "DivContainer";
-}
 
-class WordContainer extends DivContainer {
-	override ComponentName: string = "WordContainer";
-	protected override ElementTag: keyof HTMLElementTagNameMap = "span";
+	// The container would be inject the value of `FirstWorld`
+	@Di.DependencyInjection.Resolved("FirstWorld")
+	private readonly theWordThatInjectedToThisVar: string = "placeholder";
 
-	protected readonly DisplayText!: string;
+	constructor(name: string = "DivContainer") {
+		super();
+		this.ComponentName = name;
+	}
 
 	override Render(): Element {
 		super.Render();
-		this.CurrentElement!.prepend(document.createTextNode(this.DisplayText));
+		this.CurrentElement!.id = this.ComponentName;
+		this.CurrentElement!.prepend(
+			document.createTextNode(
+				`${this.ComponentName} - ${this.theWordThatInjectedToThisVar}`
+			)
+		);
 		return this.CurrentElement!;
 	}
 }
 
-class FirstWordContainer extends WordContainer {
-	@Di.DependencyInjection.Resolved(FirstWordDependency)
-	protected override readonly DisplayText: string = "";
-}
+const ROOT = new DivContainer();
 
-class SecondWordContainer extends WordContainer {
-	@Di.DependencyInjection.Resolved(SecondWordDependency)
-	protected override readonly DisplayText: string = "";
-}
+const HELLO = new DivContainer("Hello");
 
-const Root = new DivContainer();
+HELLO.SetAttribute("style", "color: blue;")
+	.Add(
+		new DivContainer("World")
+			.SetAttribute("style", "color: red;")
+			.SetAttribute("id", "world")
+	)
+	.Add(new DivContainer("!!!"));
+ROOT.Add(HELLO);
 
-
-/**
- * Few ways to add children :
- * Root.Children.push(new FirstWordContainer(), new SecondWordContainer());
- * ===== or =====
- * Root.Add(new FirstWordContainer(), new SecondWordContainer());
- * ===== or =====
- * Root.Children = [new FirstWordContainer(), new SecondWordContainer()];
- */
-Root.Add(new FirstWordContainer()).Add(new SecondWordContainer());
-
-const DependencyContainer = new Di.DependencyInjection.DependencyContainer(
-	Root
+const DEPENDENCY_CONTAINER = new Di.DependencyInjection.DependencyContainer(
+	ROOT
 );
 
-DependencyContainer
-	.Provide(Di.DependencyInjection.ProvidedType.Value, FirstWordDependency, "Hello ")
-	.Provide(Di.DependencyInjection.ProvidedType.Value, SecondWordDependency, ",World!");
+DEPENDENCY_CONTAINER.Provide(
+	Di.DependencyInjection.ProvidedType.Value,
+	"FirstWorld",
+	"Hello "
+).Provide(Di.DependencyInjection.ProvidedType.Value, "SecondWorld", "World");
 
-const App = new Di.App.SpaAppEntry(DependencyContainer, Root);
+const APP = new Di.App.SpaAppEntry(DEPENDENCY_CONTAINER, ROOT);
 
-const Framework = new Di.Framework.Framework(
-	App,
+const FRAMEWORK = new Di.Framework.Framework(
+	APP,
 	document.getElementById("app")!
 );
 
-Framework.Start();
-
 setTimeout(() => {
-	Root.Dispose();
+	ROOT.Dispose();
 }, 10000);
+
+FRAMEWORK.Start();
