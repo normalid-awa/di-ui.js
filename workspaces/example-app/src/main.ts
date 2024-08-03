@@ -28,17 +28,10 @@ HELLO.SetAttribute("style", "color: blue;")
 			.SetAttribute("id", "world")
 	)
 	.Add(new DivContainer("!!!"));
+
 ROOT.Add(HELLO);
 
-const DEPENDENCY_CONTAINER = new Di.DependencyInjection.DependencyContainer();
-
-DEPENDENCY_CONTAINER.Provide(
-	Di.DependencyInjection.ProvidedType.Value,
-	"FirstWorld",
-	"Hello "
-).Provide(Di.DependencyInjection.ProvidedType.Value, "SecondWorld", "World");
-
-const APP = new Di.App.SpaAppEntry(DEPENDENCY_CONTAINER, ROOT);
+const APP = new Di.App.SpaAppEntry(ROOT);
 
 const FRAMEWORK = new Di.Framework.Framework(
 	APP,
