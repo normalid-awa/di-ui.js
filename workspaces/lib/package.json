@@ -1,8 +1,18 @@
 {
 	"name": "di-ui.js",
 	"version": "1.0.0",
-	"description": "",
-	"author": "normalid",
+	"description": "The new era of front-end framework",
+	"author": {
+		"email": "rluo2018@gmail.com",
+		"name": "normalid",
+		"url": "https://github.com/normalid-awa"
+	},
+	"homepage": "https://github.com/normalid-awa/di-ui.js",
+	"bugs": {
+		"url": "https://github.com/normalid-awa/di-ui.js/issues",
+		"email": "rluo2018@gmail.com"
+	},
+	"license": "MIT",
 	"type": "module",
 	"files": [
 		"dist"
