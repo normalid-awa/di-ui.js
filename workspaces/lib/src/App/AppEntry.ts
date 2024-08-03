@@ -2,7 +2,8 @@ import { Components } from "../Components";
 import { DependencyInjection } from "../Framework";
 
 export namespace App {
-	export abstract class AppEntry {
+	export abstract class AppEntry implements Components.IDrawable {
+		public ComponentName: string = "App";
 		protected abstract RootContainer: Components.DrawableComponent;
 		protected Container: DependencyInjection.IDependencyContainer;
 
@@ -14,6 +15,7 @@ export namespace App {
 	}
 
 	export class SpaAppEntry extends AppEntry {
+		public override ComponentName: string = "SpaApp";
 		protected override RootContainer: Components.DrawableComponent;
 
 		public constructor(diContainer: DependencyInjection.IDependencyContainer, root: Components.DrawableComponent) {
