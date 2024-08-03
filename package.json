@@ -11,9 +11,9 @@
 	],
 	"scripts": {
 		"lint": "eslint .",
-		"version:patch": "npm version patch --no-git-tag-version --no-commit-hooks -ws --include-workspace-root",
-		"version:major": "npm version major --no-git-tag-version --no-commit-hooks -ws --include-workspace-root",
-		"version:minor": "npm version minor --no-git-tag-version --no-commit-hooks -ws --include-workspace-root"
+		"version:patch": "npm version patch -ws --include-workspace-root",
+		"version:major": "npm version major -ws --include-workspace-root",
+		"version:minor": "npm version minor -ws --include-workspace-root"
 	},
 	"devDependencies": {
 		"@eslint/eslintrc": "^3.1.0",
