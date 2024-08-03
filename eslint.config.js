@@ -30,13 +30,8 @@ export default [
 				},
 				{
 					selector: "variable",
-					modifiers: ["global", "const"],
-					format: ["UPPER_CASE"],
-				},
-				{
-					selector: "variable",
 					modifiers: ["const"],
-					format: ["snake_case"],
+					format: ["UPPER_CASE"],
 				},
 				{
 					selector: "interface",
@@ -70,10 +65,6 @@ export default [
 				{
 					selector: ["function"],
 					modifiers: ["exported"],
-					format: ["StrictPascalCase"],
-				},
-				{
-					selector: ["class"],
 					format: ["StrictPascalCase"],
 				},
 			],
@@ -142,14 +133,7 @@ export default [
 			"@typescript-eslint/prefer-namespace-keyword": "error",
 			"@typescript-eslint/prefer-optional-chain": "error",
 			"@typescript-eslint/prefer-readonly": "warn",
-			//NOTES: Having bug with using interface method
-			// "@typescript-eslint/prefer-readonly-parameter-types": [
-			// 	"error",
-			// 	{
-			// 		ignoreInferredTypes: true,
-			// 		checkParameterProperties: false,
-			// 	},
-			// ],
+			"@typescript-eslint/prefer-readonly-parameter-types": "error",
 			"@typescript-eslint/prefer-string-starts-ends-with": "error",
 			"@typescript-eslint/require-array-sort-compare": "error",
 			"@typescript-eslint/strict-boolean-expressions": "warn",
