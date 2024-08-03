@@ -8,7 +8,7 @@ export default defineConfig({
 		lib: {
 			entry: "src/index.ts",
 			name: LIB_NAME,
-			formats: ["cjs", "es", "umd"],
+			formats: ["cjs", "es", "umd", "system"],
 			fileName: "index",
 		},
 	},
