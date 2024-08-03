@@ -3,18 +3,21 @@ import dts from "vite-plugin-dts";
 
 const LIB_NAME = "di-ui";
 
-export default defineConfig({
-	build: {
-		lib: {
-			entry: "src/index.ts",
-			name: LIB_NAME,
-			formats: ["cjs", "es", "umd", "system"],
-			fileName: "index",
+export default defineConfig((env) => {
+	return {
+		build: {
+			lib: {
+				entry: "src/index.ts",
+				name: LIB_NAME,
+				formats: ["cjs", "es", "umd", "system"],
+				fileName: "index",
+			},
+			minify: !env.isPreview,
 		},
-	},
-	plugins: [
-		dts({
-			tsconfigPath: "./tsconfig.json",
-		}),
-	],
+		plugins: [
+			dts({
+				tsconfigPath: "./tsconfig.json",
+			}),
+		],
+	};
 });
