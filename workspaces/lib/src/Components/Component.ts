@@ -11,7 +11,7 @@ export namespace Components {
 
 	export abstract class DrawableComponent extends CompositeComponent {
 		public ComponentName: string = "DrawableComponent";
-		protected readonly ElementTag: string = "div";
+		protected readonly ElementTag: keyof HTMLElementTagNameMap = "div";
 		protected readonly ElementAttributes: Map<string, string> = new Map();
 
 		protected CurrentElement?: Element;
