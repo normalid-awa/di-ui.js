@@ -5,35 +5,18 @@ import * as Di from "di-ui.js";
 const FirstWordDependency: unique symbol = Symbol("FirstWordDependency");
 const SecondWordDependency: unique symbol = Symbol("SecondWordDependency");
 
-abstract class Container extends Di.Components.DrawableComponent {
-	protected override ElementTag: keyof HTMLElementTagNameMap = "div";
+class DivContainer extends Di.Components.DrawableComponent {
 	override ComponentName: string = "DivContainer";
 }
 
-class DivContainer extends Container {
-	public override ComponentName: string = "DivContainer";
-	protected override ElementTag: keyof HTMLElementTagNameMap = "div";
-	protected override CurrentElement?: HTMLDivElement;
-
-	public override Render(): Element {
-		super.Render();
-		this.CurrentElement!.style.width = "100vw";
-		return this.CurrentElement!;
-	}
-}
-
-abstract class WordContainer extends Container {
-	public override ComponentName: string = "WordContainer";
+abstract class WordContainer extends DivContainer {
+	override ComponentName: string = "WordContainer";
 	protected override ElementTag: keyof HTMLElementTagNameMap = "span";
-	protected override CurrentElement?: HTMLSpanElement;
 
 	protected abstract readonly DisplayText: string;
 
-	public override Render(): Element {
+	override Render(): Element {
 		super.Render();
-		this.CurrentElement!.style.display = "inline-block";
-		this.CurrentElement!.style.textAlign = "center";
-		this.CurrentElement!.style.width = "50vw";
 		this.CurrentElement!.prepend(document.createTextNode(this.DisplayText));
 		return this.CurrentElement!;
 	}
@@ -50,6 +33,7 @@ class SecondWordContainer extends WordContainer {
 }
 
 const Root = new DivContainer();
+
 
 /**
  * Few ways to add children :
