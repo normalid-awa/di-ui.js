@@ -9,6 +9,7 @@ export module DependencyContainer {
 	export interface IDependencyContainer {
 		/**
 		 * Provide the value to the container ``` ProvideType.Value ```
+		 * WARN: As you directly pass by this method, it will be available globally
 		 * @param key the unique key of the dependency, RECOMMENDED to use symbol
 		 * @param value any thing you want to store
 		 */
@@ -23,6 +24,8 @@ export module DependencyContainer {
 		 * Inject dependencies to the children
 		 */
 		ResolveDependency(): void;
+
+		CacheDependency(): void;
 	}
 
 	export class DependencyNotFoundError extends Error {
@@ -63,6 +66,7 @@ export module DependencyContainer {
 				Parent: undefined,
 				Children: [],
 				Dependencies: new Map<string, any>(),
+				Target: root,
 			};
 
 			for (const child of root.Children) {
@@ -86,33 +90,40 @@ export module DependencyContainer {
 			return dependency_tree;
 		}
 
+		//TODO: Implement this
 		ResolveDependency(): void {
 			this.BuildDependencyTree();
 
 			// flatern di injection
-			const flat_children = this.injectedTargetRoot.ExtractChildrenToFlatList();
+			// const flat_children = this.injectedTargetRoot.ExtractChildrenToFlatList();
 
-			for (const child of flat_children) {
-				const own_keys = Object.getOwnPropertyNames(child);
-				for (const property_key of own_keys) {
-					if (
-						Reflect.hasMetadata(
-							MetadataKeys.ResolvedProperty,
-							child,
-							property_key
-						)
-					) {
-						const inject_key: string = Reflect.getMetadata(
-							MetadataKeys.ResolvedProperty,
-							child,
-							property_key
-						) as string;
-						(child as Record<string, any>)[property_key] = this.Get(
-							inject_key
-						) as unknown;
-					}
-				}
-			}
+			// for (const child of flat_children) {
+			// 	const own_keys = Object.getOwnPropertyNames(child);
+			// 	for (const property_key of own_keys) {
+			// 		if (
+			// 			Reflect.hasMetadata(
+			// 				MetadataKeys.ResolvedProperty,
+			// 				child,
+			// 				property_key
+			// 			)
+			// 		) {
+			// 			const inject_key: string = Reflect.getMetadata(
+			// 				MetadataKeys.ResolvedProperty,
+			// 				child,
+			// 				property_key
+			// 			) as string;
+			// 			(child as Record<string, any>)[property_key] = this.Get(
+			// 				inject_key
+			// 			) as unknown;
+			// 		}
+			// 	}
+			// }
+
+		}
+
+		//TODO: Implement this
+		CacheDependency(): void {
+			
 		}
 
 		private getKeyName(
