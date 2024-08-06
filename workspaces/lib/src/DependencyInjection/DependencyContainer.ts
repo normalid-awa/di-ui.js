@@ -31,6 +31,9 @@ export module DependencyContainer {
 		}
 	}
 
+	//WARN: Not sure this is appropriate to exsite in here
+	// This code must be refactor in the near future, for now it is ok
+	// As long as the development, this will become a huge tech debt.
 	interface IDependencyTree {
 		Parent: IDependencyTree | undefined;
 		Children: IDependencyTree[];
