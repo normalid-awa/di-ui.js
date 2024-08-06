@@ -85,5 +85,16 @@ export module Composite {
 		public Dispose(): void {
 			this.Children.forEach((child) => void child.Dispose());
 		}
+
+		public ExtractChildrenToFlatList(children: IComposable[]): IComposable[] {
+			const flat_map: IComposable[] = [];
+			children.forEach((child) => {
+				flat_map.push(child);
+				flat_map.push(
+					...this.ExtractChildrenToFlatList(child.Children)
+				);
+			});
+			return flat_map;
+		}
 	}
 }
