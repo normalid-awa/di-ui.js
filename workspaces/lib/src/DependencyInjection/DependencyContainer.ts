@@ -62,6 +62,7 @@ export module DependencyContainer {
 		private transformCompositeComponentIntoDependencyTree(
 			root: Composite.IComposable
 		): IDependencyTree {
+			//WARN: structuredClone is not the most performant friendly way to do this, but it's native, so there will be optimization received from v8 or whatever
 			const dependency_tree: IDependencyTree = structuredClone(
 				this.dependencyTree
 			);
