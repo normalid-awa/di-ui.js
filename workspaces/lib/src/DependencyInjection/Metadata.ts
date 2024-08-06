@@ -6,5 +6,7 @@ import "reflect-metadata"
  * for indentify the inject action
  */
 export class MetadataKeys {
-	static InjectableProperty = Symbol("InjectableProperty");
+	static ResolvedProperty = Symbol("ResolvedProperty");
+	static CachedProperty = Symbol("CachedProperty");
+	static CachedAsProperty = Symbol("CachedAsProperty");
 }
