@@ -27,7 +27,7 @@ export module DependencyContainer {
 		/**
 		 * Inject dependencies to the children
 		 */
-		// ResolveRoot(): void;
+		ResolveRoot(): void;
 	}
 
 	export class DependencyNotFoundError extends Error {
@@ -36,42 +36,52 @@ export module DependencyContainer {
 		}
 	}
 
+	interface IDependencyTree {
+		Parent: IDependencyTree | undefined;
+		Children: IDependencyTree[];
+
+		dependencies: Map<string, any>;
+	}
+
 	export class DependencyContainer implements IDependencyContainer {
-		private readonly valuesDependencies: Map<string, any> = new Map();
-		private readonly singletonsDependencies: Map<string, any> = new Map();
+		private readonly dependencyTree: IDependencyTree = {
+			Parent: undefined,
+			Children: [],
+			dependencies: new Map<string, any>(),
+		};
 		private readonly injectTargetRoot: Composite.IComposable;
 
 		constructor(injectTargetRoot: Composite.IComposable) {
 			this.injectTargetRoot = injectTargetRoot;
 		}
 
-		// ResolveRoot(): void {
-		// 	const flat_children = this.extractAllChildrenIntoFlatMap(
-		// 		this.injectTargetRoot.Children
-		// 	);
+		ResolveRoot(): void {
+			const flat_children = this.extractAllChildrenIntoFlatMap(
+				this.injectTargetRoot.Children
+			);
 
-		// 	for (const child of flat_children) {
-		// 		const own_keys = Object.getOwnPropertyNames(child);
-		// 		for (const property_key of own_keys) {
-		// 			if (
-		// 				Reflect.hasMetadata(
-		// 					MetadataKeys.InjectableProperty,
-		// 					child,
-		// 					property_key
-		// 				)
-		// 			) {
-		// 				const inject_key: string = Reflect.getMetadata(
-		// 					MetadataKeys.InjectableProperty,
-		// 					child,
-		// 					property_key
-		// 				) as string;
-		// 				(child as Record<string, any>)[property_key] = this.Get(
-		// 					inject_key
-		// 				) as unknown;
-		// 			}
-		// 		}
-		// 	}
-		// }
+			for (const child of flat_children) {
+				const own_keys = Object.getOwnPropertyNames(child);
+				for (const property_key of own_keys) {
+					if (
+						Reflect.hasMetadata(
+							MetadataKeys.InjectableProperty,
+							child,
+							property_key
+						)
+					) {
+						const inject_key: string = Reflect.getMetadata(
+							MetadataKeys.InjectableProperty,
+							child,
+							property_key
+						) as string;
+						(child as Record<string, any>)[property_key] = this.Get(
+							inject_key
+						) as unknown;
+					}
+				}
+			}
+		}
 
 		private extractAllChildrenIntoFlatMap(
 			children: Composite.IComposable[]
@@ -86,13 +96,12 @@ export module DependencyContainer {
 			return flat_map;
 		}
 
-		private determineKeyType(
+		private getKeyName(
 			key: DependencyLitralKey | DependencyTypeKey<any>
-		): ProvideType {
-			if (typeof key == "symbol" || typeof key == "string") 
-				return ProvideType.Value;
-			else if (typeof key == "function") 
-				return ProvideType.Singleton;
+		): string {
+			if (typeof key == "symbol" || typeof key == "string")
+				return key.toString();
+			else if (typeof key == "function") return key.name;
 			throw new DependencyNotFoundError(String(key));
 		}
 
@@ -100,30 +109,12 @@ export module DependencyContainer {
 			key: DependencyLitralKey | DependencyTypeKey<T>,
 			value: T
 		): this {
-			switch (this.determineKeyType(key)) {
-				case ProvideType.Value:
-					key = key as DependencyLitralKey;
-					this.valuesDependencies.set(key.toString(), value);
-					break;
-				case ProvideType.Singleton:
-					key = key as DependencyTypeKey<T>;
-					this.singletonsDependencies.set(key.name, value);
-					break;
-			}
+			this.dependencyTree.dependencies.set(this.getKeyName(key), value);
 			return this;
 		}
 
 		Get<T>(key: DependencyLitralKey | DependencyTypeKey<T>): T {
-			switch (this.determineKeyType(key)) {
-				case ProvideType.Value:
-					key = key as DependencyLitralKey;
-					return this.valuesDependencies.get(key.toString()) as T;
-				case ProvideType.Singleton:
-					key = key as DependencyTypeKey<T>;
-					return this.singletonsDependencies.get(key.name) as T;
-				default:
-					throw new DependencyNotFoundError(String(key));
-			}
+			return this.dependencyTree.dependencies.get(this.getKeyName(key)) as T;
 		}
 	}
 }
