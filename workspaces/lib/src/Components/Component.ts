@@ -1,27 +1,20 @@
-// import { Composite } from "../Composite";
 import { Composite } from "../Composite";
-import { DependencyInjection } from "../Framework";
 import { HTMLTags } from "../types";
 
 export module Components {
-	export abstract class CompositeComponent
-		extends Composite.Composite
-		implements Composite.IComposable, DependencyInjection.IInjectable
-	{
-		public LoadComplete(): void {}
-	}
-
 	export interface IDrawable {
 		readonly ComponentName: string;
-		Presented: boolean;
+
+		/**
+		 * The final output of a component, will be rendered as a DOM element
+		 */
 		Render(): Element;
 	}
 
 	export abstract class DrawableComponent
-		extends CompositeComponent
-		implements IDrawable
+		extends Composite.Componenet
+		implements IDrawable, Composite.IComposable
 	{
-		public Presented: boolean = false;
 		public abstract ComponentName: string;
 		protected abstract readonly ElementTag: NoInfer<HTMLTags>;
 		protected readonly ElementAttributes: Map<string, string> = new Map();

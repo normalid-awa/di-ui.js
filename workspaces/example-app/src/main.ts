@@ -41,17 +41,17 @@ abstract class WordContainer extends Container {
 }
 
 class FirstWordContainer extends WordContainer {
-	@Di.DependencyInjection.Resolved(FirstWordDependency)
+	@Di.Injectable.Resolved(FirstWordDependency)
 	protected override readonly DisplayText!: string;
 }
 
 class SecondWordContainer extends WordContainer {
-	@Di.DependencyInjection.Resolved(SecondWordDependency)
+	@Di.Injectable.Resolved(SecondWordDependency)
 	protected override readonly DisplayText!: string;
 }
 
 class ShownLaterThirdWordContainer extends WordContainer {
-	@Di.DependencyInjection.Resolved(ThirdWordDependency)
+	@Di.Injectable.Resolved(ThirdWordDependency)
 	protected override readonly DisplayText!: string;
 }
 
@@ -65,16 +65,17 @@ const Root = new DivContainer();
  * ===== or =====
  * Root.Children = [new FirstWordContainer(), new SecondWordContainer()];
  */
-Root.Add(new FirstWordContainer()).Add(new SecondWordContainer());
+Root.Add(new FirstWordContainer()).Add(
+	new SecondWordContainer().Add(new FirstWordContainer())
+);
 
-const DependencyContainer = new Di.DependencyInjection.DependencyContainer(
+const DependencyContainer = new Di.DependencyContainer.DependencyContainer(
 	Root
 );
 
-DependencyContainer
-	.Provide(Di.DependencyInjection.ProvidedType.Value, FirstWordDependency, "This is the ")
-	.Provide(Di.DependencyInjection.ProvidedType.Value, SecondWordDependency, ",New era of front-end development!!!")
-	.Provide(Di.DependencyInjection.ProvidedType.Value, ThirdWordDependency, "Dependency injection is awesome!!");
+DependencyContainer.Provide(FirstWordDependency, "This is the ")
+	.Provide(SecondWordDependency, ",New era of front-end development!!!")
+	.Provide(ThirdWordDependency, "Dependency injection is awesome!!");
 
 const App = new Di.App.SpaAppEntry(DependencyContainer, Root);
 
@@ -88,8 +89,8 @@ Framework.Start();
 setTimeout(() => {
 	//TODO: Reactive update will be implement later in the framework
 	Root.Add(new ShownLaterThirdWordContainer());
-}, 1000)
+}, 1000);
 
 setTimeout(() => {
 	Root.Dispose();
-}, 10000);
+}, 100000);
