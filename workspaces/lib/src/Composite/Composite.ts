@@ -39,7 +39,7 @@ export module Composite {
 		Dispose(): void;
 	}
 
-	export abstract class Composite implements IComposable {
+	export abstract class Componenet implements IComposable {
 		public Parent: IComposable | undefined;
 
 		public Children: IComposable[];
@@ -64,13 +64,15 @@ export module Composite {
 
 		public Remove(item: IComposable | IComposable[]): void {
 			const remove = (singleItem: IComposable): void => {
-				if (!this.Children.includes(singleItem)) throw new ComponentNotFound(JSON.stringify(singleItem));
+				if (!this.Children.includes(singleItem))
+					throw new ComponentNotFound(JSON.stringify(singleItem));
 
 				const index = this.Children.indexOf(singleItem);
 				this.Children.splice(index, 1);
-			}
+			};
 
-			if (Array.isArray(item)) item.forEach((child) => void remove(child));
+			if (Array.isArray(item))
+				item.forEach((child) => void remove(child));
 			else remove(item);
 		}
 

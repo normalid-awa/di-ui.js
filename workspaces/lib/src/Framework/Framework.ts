@@ -1,9 +1,6 @@
 import { App } from "../App";
-import { DependencyInjection } from "./DependencyContainer";
 
 export module Framework {
-	export type HTMLString = string;
-
 	export class Framework {
 		private readonly appEntry: App.AppEntry;
 		private readonly root: Element;
