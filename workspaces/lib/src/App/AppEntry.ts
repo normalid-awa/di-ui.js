@@ -14,7 +14,7 @@ export module App {
 
 		public Render(): Element {
 			this.Presented = true;
-			this.Container.ResolveRoot();
+			this.Container.ResolveDependency();
 			return this.RootComponenet.Render();
 		}
 	}

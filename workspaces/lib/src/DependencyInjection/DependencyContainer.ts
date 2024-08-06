@@ -22,7 +22,7 @@ export module DependencyContainer {
 		/**
 		 * Inject dependencies to the children
 		 */
-		ResolveRoot(): void;
+		ResolveDependency(): void;
 	}
 
 	export class DependencyNotFoundError extends Error {
@@ -86,7 +86,7 @@ export module DependencyContainer {
 			return dependency_tree;
 		}
 
-		ResolveRoot(): void {
+		ResolveDependency(): void {
 			this.BuildDependencyTree();
 
 			// flatern di injection
