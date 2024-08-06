@@ -48,7 +48,7 @@ export module DependencyContainer {
 		private readonly injectedTargetRoot: Composite.IComposable;
 
 		private readonly dependencyTree: IDependencyTree;
-		
+
 		constructor(injectTargetRoot: Composite.IComposable) {
 			this.injectedTargetRoot = injectTargetRoot;
 			this.dependencyTree = {
@@ -62,12 +62,9 @@ export module DependencyContainer {
 		private transformCompositeComponentIntoDependencyTree(
 			root: Composite.IComposable
 		): IDependencyTree {
-			const dependency_tree: IDependencyTree = {
-				Parent: undefined,
-				Children: [],
-				Dependencies: new Map<string, any>(),
-				Target: root,
-			};
+			const dependency_tree: IDependencyTree = structuredClone(
+				this.dependencyTree
+			);
 
 			for (const child of root.Children) {
 				dependency_tree.Children.push({
@@ -92,8 +89,8 @@ export module DependencyContainer {
 
 		//TODO: Implement this
 		ResolveDependency(): void {
-			this.BuildDependencyTree();
-
+			console.log(this.BuildDependencyTree());
+			console.log(this.dependencyTree);
 			// flatern di injection
 			// const flat_children = this.injectedTargetRoot.ExtractChildrenToFlatList();
 
@@ -118,13 +115,10 @@ export module DependencyContainer {
 			// 		}
 			// 	}
 			// }
-
 		}
 
 		//TODO: Implement this
-		CacheDependency(): void {
-			
-		}
+		CacheDependency(): void {}
 
 		private getKeyName(
 			key: DependencyLitralKey | DependencyTypeKey<any>
