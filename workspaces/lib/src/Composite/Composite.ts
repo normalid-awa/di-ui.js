@@ -37,6 +37,8 @@ export module Composite {
 		 * Dispose this component and all its children
 		 */
 		Dispose(): void;
+
+		ExtractChildrenToFlatList(): IComposable[];
 	}
 
 	export abstract class Componenet implements IComposable {
@@ -86,15 +88,19 @@ export module Composite {
 			this.Children.forEach((child) => void child.Dispose());
 		}
 
-		public ExtractChildrenToFlatList(children: IComposable[]): IComposable[] {
+		private extractChildrenToFlatList(children: IComposable[]): IComposable[] {
 			const flat_map: IComposable[] = [];
 			children.forEach((child) => {
 				flat_map.push(child);
 				flat_map.push(
-					...this.ExtractChildrenToFlatList(child.Children)
+					...this.extractChildrenToFlatList(child.Children)
 				);
 			});
 			return flat_map;
+		}
+
+		public ExtractChildrenToFlatList(): IComposable[] {
+			return this.extractChildrenToFlatList(this.Children);
 		}
 	}
 }

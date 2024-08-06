@@ -6,11 +6,6 @@ export module DependencyContainer {
 	export type DependencyLitralKey = string | symbol;
 	export type DependencyTypeKey<T> = new () => T;
 
-	export enum ProvideType {
-		Value = "Value",
-		Singleton = "Singleton",
-	}
-
 	export interface IDependencyContainer {
 		/**
 		 * Provide the value to the container ``` ProvideType.Value ```
@@ -39,7 +34,6 @@ export module DependencyContainer {
 	interface IDependencyTree {
 		Parent: IDependencyTree | undefined;
 		Children: IDependencyTree[];
-
 		dependencies: Map<string, any>;
 	}
 
@@ -49,29 +43,57 @@ export module DependencyContainer {
 			Children: [],
 			dependencies: new Map<string, any>(),
 		};
-		private readonly injectTargetRoot: Composite.IComposable;
+		private readonly injectedTargetRoot: Composite.IComposable;
 
 		constructor(injectTargetRoot: Composite.IComposable) {
-			this.injectTargetRoot = injectTargetRoot;
+			this.injectedTargetRoot = injectTargetRoot;
+		}
+
+		private transformCompositeComponentIntoDependencyTree(
+			root: Composite.IComposable,
+		): IDependencyTree {
+			const dependency_tree: IDependencyTree = {
+				Parent: undefined,
+				Children: [],
+				dependencies: new Map<string, any>(),
+			};
+
+			for (const child of root.Children) {
+				dependency_tree.Children.push({
+					...this.transformCompositeComponentIntoDependencyTree(child),
+					Parent: dependency_tree,
+				});
+				//TODO: dependency properties needs to be setted here
+			}
+
+			return dependency_tree;
+		}
+
+		protected BuildDependencyTree(): IDependencyTree {
+			const dependency_tree = this.transformCompositeComponentIntoDependencyTree(
+				this.injectedTargetRoot
+			)
+			return dependency_tree;
 		}
 
 		ResolveRoot(): void {
-			const flat_children = this.extractAllChildrenIntoFlatMap(
-				this.injectTargetRoot.Children
-			);
+			this.BuildDependencyTree();
+
+			// flatern di injection
+			const flat_children = this.injectedTargetRoot.ExtractChildrenToFlatList();
 
 			for (const child of flat_children) {
 				const own_keys = Object.getOwnPropertyNames(child);
 				for (const property_key of own_keys) {
 					if (
 						Reflect.hasMetadata(
-							MetadataKeys.InjectableProperty,
+							MetadataKeys.ResolvedProperty,
 							child,
 							property_key
 						)
 					) {
 						const inject_key: string = Reflect.getMetadata(
-							MetadataKeys.InjectableProperty,
+							MetadataKeys.ResolvedProperty,
 							child,
 							property_key
 						) as string;
@@ -81,19 +103,6 @@ export module DependencyContainer {
 					}
 				}
 			}
-		}
-
-		private extractAllChildrenIntoFlatMap(
-			children: Composite.IComposable[]
-		): Composite.IComposable[] {
-			const flat_map: Composite.IComposable[] = [];
-			children.forEach((child) => {
-				flat_map.push(child);
-				flat_map.push(
-					...this.extractAllChildrenIntoFlatMap(child.Children)
-				);
-			});
-			return flat_map;
 		}
 
 		private getKeyName(
@@ -114,7 +123,9 @@ export module DependencyContainer {
 		}
 
 		Get<T>(key: DependencyLitralKey | DependencyTypeKey<T>): T {
-			return this.dependencyTree.dependencies.get(this.getKeyName(key)) as T;
+			return this.dependencyTree.dependencies.get(
+				this.getKeyName(key)
+			) as T;
 		}
 	}
 }
