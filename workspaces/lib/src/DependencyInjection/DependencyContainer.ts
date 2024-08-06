@@ -34,33 +34,39 @@ export module DependencyContainer {
 	interface IDependencyTree {
 		Parent: IDependencyTree | undefined;
 		Children: IDependencyTree[];
-		dependencies: Map<string, any>;
+		Dependencies: Map<string, any>;
+		Target: Composite.IComposable;
 	}
 
 	export class DependencyContainer implements IDependencyContainer {
-		private readonly dependencyTree: IDependencyTree = {
-			Parent: undefined,
-			Children: [],
-			dependencies: new Map<string, any>(),
-		};
 		private readonly injectedTargetRoot: Composite.IComposable;
 
+		private readonly dependencyTree: IDependencyTree;
+		
 		constructor(injectTargetRoot: Composite.IComposable) {
 			this.injectedTargetRoot = injectTargetRoot;
+			this.dependencyTree = {
+				Parent: undefined,
+				Children: [],
+				Dependencies: new Map<string, any>(),
+				Target: injectTargetRoot,
+			};
 		}
 
 		private transformCompositeComponentIntoDependencyTree(
-			root: Composite.IComposable,
+			root: Composite.IComposable
 		): IDependencyTree {
 			const dependency_tree: IDependencyTree = {
 				Parent: undefined,
 				Children: [],
-				dependencies: new Map<string, any>(),
+				Dependencies: new Map<string, any>(),
 			};
 
 			for (const child of root.Children) {
 				dependency_tree.Children.push({
-					...this.transformCompositeComponentIntoDependencyTree(child),
+					...this.transformCompositeComponentIntoDependencyTree(
+						child
+					),
 					Parent: dependency_tree,
 				});
 				//TODO: dependency properties needs to be setted here
@@ -70,9 +76,10 @@ export module DependencyContainer {
 		}
 
 		protected BuildDependencyTree(): IDependencyTree {
-			const dependency_tree = this.transformCompositeComponentIntoDependencyTree(
-				this.injectedTargetRoot
-			)
+			const dependency_tree =
+				this.transformCompositeComponentIntoDependencyTree(
+					this.injectedTargetRoot
+				);
 			return dependency_tree;
 		}
 
@@ -118,12 +125,12 @@ export module DependencyContainer {
 			key: DependencyLitralKey | DependencyTypeKey<T>,
 			value: T
 		): this {
-			this.dependencyTree.dependencies.set(this.getKeyName(key), value);
+			this.dependencyTree.Dependencies.set(this.getKeyName(key), value);
 			return this;
 		}
 
 		Get<T>(key: DependencyLitralKey | DependencyTypeKey<T>): T {
-			return this.dependencyTree.dependencies.get(
+			return this.dependencyTree.Dependencies.get(
 				this.getKeyName(key)
 			) as T;
 		}
