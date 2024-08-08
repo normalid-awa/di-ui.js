@@ -27,8 +27,7 @@
 		"typescript": "^5.5.4",
 		"typescript-eslint": "^8.0.0",
 		"vite": "^5.3.5",
-		"vite-plugin-dts": "^4.0.0-beta.2",
-		"vitest": "^2.0.5"
+		"vite-plugin-dts": "^4.0.0-beta.2"
 	},
 	"dependencies": {
 		"reflect-metadata": "^0.2.2"
