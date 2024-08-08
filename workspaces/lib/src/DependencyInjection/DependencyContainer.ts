@@ -1,6 +1,7 @@
 import "reflect-metadata";
 import { MetadataKeys } from "./Metadata";
 import { Composite } from "../Composite";
+import { Injectable } from "./Injectable";
 
 export module DependencyContainer {
 	export type DependencyLitralKey = string | symbol;
@@ -18,8 +19,6 @@ export module DependencyContainer {
 			value: T
 		): this;
 
-		Get<T>(key: DependencyLitralKey | DependencyTypeKey<T>): T;
-
 		/**
 		 * Inject dependencies to the children
 		 */
@@ -34,47 +33,111 @@ export module DependencyContainer {
 		}
 	}
 
+	export type InjectableMetadataTypes =
+		| Injectable.ICachedPropertyMetadata
+		| Injectable.IResolvedPropertyMetadata;
+
+	export type DependenciesMappedType = Map<
+		"Cached" | "Resolved",
+		Map<string, any>
+	>;
+
 	//WARN: Not sure this is appropriate to exsite in here
 	// This code must be refactor in the near future, for now it is ok
 	// As long as the development, this will become a huge tech debt.
 	interface IDependencyTree {
 		Parent: IDependencyTree | undefined;
 		Children: IDependencyTree[];
-		Dependencies: Map<string, any>;
+		Dependencies: DependenciesMappedType;
 		Target: Composite.IComposable;
 	}
 
 	export class DependencyContainer implements IDependencyContainer {
 		private readonly injectedTargetRoot: Composite.IComposable;
 
-		private readonly dependencyTree: IDependencyTree;
+		private dependencyTree: IDependencyTree;
 
 		constructor(injectTargetRoot: Composite.IComposable) {
 			this.injectedTargetRoot = injectTargetRoot;
 			this.dependencyTree = {
 				Parent: undefined,
 				Children: [],
-				Dependencies: new Map<string, any>(),
+				Dependencies: new Map(),
 				Target: injectTargetRoot,
 			};
 		}
 
+		private extractInjectableMetadata(
+			target: object
+		): Record<keyof typeof MetadataKeys, InjectableMetadataTypes[]> {
+			const result: Record<
+				keyof typeof MetadataKeys,
+				InjectableMetadataTypes[]
+			> = {
+				CachedProperty: [],
+				ResolvedProperty: [],
+			};
+			const own_keys = Object.getOwnPropertyNames(target);
+			for (const property_key of own_keys)
+				(
+					Object.getOwnPropertyNames(
+						MetadataKeys
+					) as (keyof typeof MetadataKeys)[]
+				).forEach((metakey: keyof typeof MetadataKeys) => {
+					if (
+						!Reflect.hasMetadata(
+							MetadataKeys[metakey],
+							target,
+							property_key
+						)
+					)
+						return;
+
+					result[metakey].push(
+						Reflect.getMetadata(
+							MetadataKeys[metakey],
+							target,
+							property_key
+						) as InjectableMetadataTypes
+					);
+				});
+
+			return result;
+		}
+
 		private transformCompositeComponentIntoDependencyTree(
-			root: Composite.IComposable
+			root: Composite.IComposable,
+			parentDependencies: DependenciesMappedType = new Map()
 		): IDependencyTree {
-			//WARN: structuredClone is not the most performant friendly way to do this, but it's native, so there will be optimization received from v8 or whatever
-			const dependency_tree: IDependencyTree = structuredClone(
-				this.dependencyTree
-			);
+			const dependency_tree: IDependencyTree = {
+				Children: [],
+				Dependencies: parentDependencies,
+				Parent: undefined,
+				Target: root,
+			};
 
 			for (const child of root.Children) {
+				const metadatas = this.extractInjectableMetadata(child);
+				const cached = new Map<string, any>();
+				const resolved = new Map<string, any>();
+
+				metadatas.CachedProperty.forEach((key) => {
+					cached.set(key.dependencyKey, key);
+				});
+				metadatas.ResolvedProperty.forEach((key) => {
+					resolved.set(key.dependencyKey, key);
+				});
+
+				const child_dependencies: DependenciesMappedType = new Map();
+				child_dependencies.set("Cached", cached);
+				child_dependencies.set("Resolved", resolved);
+
 				dependency_tree.Children.push({
 					...this.transformCompositeComponentIntoDependencyTree(
-						child
+						child,
+						child_dependencies
 					),
-					Parent: dependency_tree,
 				});
-				//TODO: dependency properties needs to be setted here
 			}
 
 			return dependency_tree;
@@ -83,39 +146,18 @@ export module DependencyContainer {
 		protected BuildDependencyTree(): IDependencyTree {
 			const dependency_tree =
 				this.transformCompositeComponentIntoDependencyTree(
-					this.injectedTargetRoot
+					this.injectedTargetRoot,
+					this.dependencyTree.Dependencies
 				);
 			return dependency_tree;
 		}
 
 		//TODO: Implement this
 		ResolveDependency(): void {
-			console.log(this.BuildDependencyTree());
+			this.dependencyTree = this.BuildDependencyTree();
 			console.log(this.dependencyTree);
-			// flatern di injection
-			// const flat_children = this.injectedTargetRoot.ExtractChildrenToFlatList();
 
-			// for (const child of flat_children) {
-			// 	const own_keys = Object.getOwnPropertyNames(child);
-			// 	for (const property_key of own_keys) {
-			// 		if (
-			// 			Reflect.hasMetadata(
-			// 				MetadataKeys.ResolvedProperty,
-			// 				child,
-			// 				property_key
-			// 			)
-			// 		) {
-			// 			const inject_key: string = Reflect.getMetadata(
-			// 				MetadataKeys.ResolvedProperty,
-			// 				child,
-			// 				property_key
-			// 			) as string;
-			// 			(child as Record<string, any>)[property_key] = this.Get(
-			// 				inject_key
-			// 			) as unknown;
-			// 		}
-			// 	}
-			// }
+			
 		}
 
 		//TODO: Implement this
@@ -134,14 +176,17 @@ export module DependencyContainer {
 			key: DependencyLitralKey | DependencyTypeKey<T>,
 			value: T
 		): this {
-			this.dependencyTree.Dependencies.set(this.getKeyName(key), value);
-			return this;
-		}
+			if (!this.dependencyTree.Dependencies.has("Cached"))
+				this.dependencyTree.Dependencies.set(
+					"Cached",
+					new Map<string, T>()
+				);
 
-		Get<T>(key: DependencyLitralKey | DependencyTypeKey<T>): T {
-			return this.dependencyTree.Dependencies.get(
-				this.getKeyName(key)
-			) as T;
+			this.dependencyTree.Dependencies.get("Cached")!.set(
+				this.getKeyName(key),
+				value
+			);
+			return this;
 		}
 	}
 }
