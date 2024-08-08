@@ -12,6 +12,10 @@
 		"url": "https://github.com/normalid-awa/di-ui.js/issues",
 		"email": "rluo2018@gmail.com"
 	},
+	"repository": {
+		"url": "https://github.com/normalid-awa/di-ui.js/",
+		"type": "git"
+	},
 	"readme": "README.md",
 	"keywords": [
 		"front-end",
