@@ -32,7 +32,7 @@ export module DependencyContainer {
 	export class DependencyNotFoundError extends Error {
 		constructor(dependencyKey: string, dependencyTree: IDependencyTree) {
 			super(
-				`Dependency "${dependencyKey}" not found in the dependency tree:[ ${Array.from(
+				`Dependency "${dependencyKey}" not found in the dependency tree:[${Array.from(
 					dependencyTree.Dependencies.Cached.keys()
 				).join(", ".toString())}]`
 			);
@@ -85,7 +85,10 @@ export module DependencyContainer {
 				CachedProperty: [],
 				ResolvedProperty: [],
 			};
-			const own_keys = Object.getOwnPropertyNames(target);
+			const own_keys = Object.getOwnPropertyNames(target).concat(
+				Object.getOwnPropertyNames(Object.getPrototypeOf(target))
+			);
+			
 			for (const property_key of own_keys)
 				(
 					Object.getOwnPropertyNames(
@@ -93,24 +96,40 @@ export module DependencyContainer {
 					) as (keyof typeof MetadataKeys)[]
 				).forEach((metakey: keyof typeof MetadataKeys) => {
 					if (
-						!Reflect.hasMetadata(
+						Reflect.hasMetadata(
 							MetadataKeys[metakey],
 							target,
 							property_key
 						)
-					)
-						return;
-
-					result[metakey].push({
-						...(Reflect.getMetadata(
+					) {
+						result[metakey].push({
+							...(Reflect.getMetadata(
+								MetadataKeys[metakey],
+								target,
+								property_key
+							) as Injectable.InjectablePropertyMetadata),
+							//This is because the metadata's target is the obejct i.e. it's not instaniated yet, the target here is the
+							// instaniated object get from the vdom tree.
+							Target: target,
+						});
+					} else if (
+						Reflect.hasOwnMetadata(
 							MetadataKeys[metakey],
 							target,
 							property_key
-						) as Injectable.InjectablePropertyMetadata),
-						//This is because the metadata's target is the obejct i.e. it's not instaniated yet, the target here is the
-						// instaniated object get from the vdom tree.
-						Target: target,
-					});
+						)
+					) {
+						result[metakey].push({
+							...(Reflect.getOwnMetadata(
+								MetadataKeys[metakey],
+								target,
+								property_key
+							) as Injectable.InjectablePropertyMetadata),
+							//This is because the metadata's target is the obejct i.e. it's not instaniated yet, the target here is the
+							// instaniated object get from the vdom tree.
+							Target: target,
+						});
+					}
 				});
 
 			return result;

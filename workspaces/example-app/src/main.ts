@@ -53,6 +53,13 @@ class SecondWordContainer extends WordContainer {
 	@Di.Injectable.Cached("SomeWord")
 	private SomeWordToBeCache = "SomeWord";
 
+	private somePrivateWord = "some private word";
+
+	@Di.Injectable.Cached("SomeFunction")
+	public SomeFunctionWouldBeCached() {
+		return `but i can't access private word: ${this.somePrivateWord}, because the dic euraced the "this" keyword :(`;
+	}
+
 	constructor() {
 		super();
 		this.SomeWordToBeCache += " " + "Constructor!";
@@ -69,18 +76,21 @@ class ShownLaterThirdWordContainer extends WordContainer {
 	public declare DisplayText: string;
 
 	@Di.Injectable.Resolved("SomeWord")
-	public readonly SomeWordToBeResolve: string = "not resolved";
+	public readonly SomeWordToBeResolve!: string;
 
+	@Di.Injectable.Resolved("SomeFunction")
+	public readonly SomeFunctionWouldBeResolved!: () => string;
+		
 	constructor() {
 		super();
-		//Will log "not resolved" because object constructor is alwasy ahead of injecting chain
+		//Will log "undefined" because object constructor is alwasy ahead of injecting chain
 		console.log(this.SomeWordToBeResolve);
 	}
 
 	public override Render(): Element {
 		// Will correctly log the injected value
 		console.log(this.SomeWordToBeResolve);
-		this.DisplayText = this.SomeWordToBeResolve;
+		this.DisplayText = this.SomeWordToBeResolve + " " + this.SomeFunctionWouldBeResolved();
 		return super.Render();
 	}
 }
