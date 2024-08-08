@@ -8,5 +8,4 @@ import "reflect-metadata"
 export class MetadataKeys {
 	static ResolvedProperty = Symbol("ResolvedProperty");
 	static CachedProperty = Symbol("CachedProperty");
-	static CachedAsProperty = Symbol("CachedAsProperty");
 }
