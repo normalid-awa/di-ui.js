@@ -16,12 +16,6 @@ export module Injectable {
 
 	// #region Decorators
 
-	export interface IResolvedPropertyMetadata {
-		dependencyKey: string;
-		target: Object;
-		targetPropertyKey: string;
-	}
-
 	export function Resolved(
 		injectKey: string | symbol | Typed
 	): PropertyDecorator {
@@ -32,10 +26,10 @@ export module Injectable {
 			Reflect.defineMetadata(
 				MetadataKeys.ResolvedProperty,
 				{
-					dependencyKey: injectKey.toString(),
-					target: target,
-					targetPropertyKey: propertyKey.toString(),
-				} satisfies IResolvedPropertyMetadata,
+					DependencyKey: injectKey.toString(),
+					Target: target,
+					TargetPropertyKey: propertyKey.toString(),
+				} satisfies InjectablePropertyMetadata,
 				target,
 				propertyKey
 			);
@@ -55,20 +49,23 @@ export module Injectable {
 			Reflect.defineMetadata(
 				MetadataKeys.CachedProperty,
 				{
-					dependencyKey: injectKey.toString(),
-					target: target,
-					targetPropertyKey: propertyKey.toString(),
-				} satisfies ICachedPropertyMetadata,
+					DependencyKey: injectKey.toString(),
+					Target: target,
+					TargetPropertyKey: propertyKey.toString(),
+				} satisfies InjectablePropertyMetadata,
 				target,
 				propertyKey
 			);
 		};
 	}
 
-	export interface ICachedPropertyMetadata {
-		dependencyKey: string;
-		target: Object;
-		targetPropertyKey: string;
+	export abstract class InjectablePropertyMetadata {
+		abstract DependencyKey: string;
+		/**
+		 * The target here is the object not an instance
+		 */
+		abstract Target: Object;
+		abstract TargetPropertyKey: string;
 	}
 
 	// #endregion
