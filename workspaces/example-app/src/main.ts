@@ -23,14 +23,15 @@ class DivContainer extends Container {
 	}
 }
 
-abstract class WordContainer extends Container {
+class WordContainer extends Container {
 	public override ComponentName: string = "WordContainer";
 	protected override ElementTag: keyof HTMLElementTagNameMap = "span";
 	protected override CurrentElement?: HTMLSpanElement;
 
-	protected abstract readonly DisplayText: string;
+	protected readonly DisplayText!: string;
 
 	public override Render(): Element {
+		// console.log("render", this.DisplayText);
 		super.Render();
 		this.CurrentElement!.style.display = "inline-block";
 		this.CurrentElement!.style.textAlign = "center";
@@ -42,17 +43,56 @@ abstract class WordContainer extends Container {
 
 class FirstWordContainer extends WordContainer {
 	@Di.Injectable.Resolved(FirstWordDependency)
-	protected override readonly DisplayText!: string;
+	protected declare DisplayText: string;
 }
 
 class SecondWordContainer extends WordContainer {
 	@Di.Injectable.Resolved(SecondWordDependency)
-	protected override readonly DisplayText!: string;
+	declare readonly DisplayText: string;
+
+	@Di.Injectable.Cached("SomeWord")
+	private SomeWordToBeCache = "SomeWord";
+
+	private somePrivateWord = "some private word";
+
+	@Di.Injectable.Cached("SomeFunction")
+	public SomeFunctionWouldBeCached() {
+		return `but i can't access private word: ${this.somePrivateWord}, because the dic euraced the "this" keyword :(`;
+	}
+
+	constructor() {
+		super();
+		this.SomeWordToBeCache += " " + "Constructor!";
+	}
+
+	public override Render(): Element {
+		// This appended string won't be shown below, because the dic only tracked to constructor
+		this.SomeWordToBeCache += " " + "Render!";
+		return super.Render();
+	}
 }
 
 class ShownLaterThirdWordContainer extends WordContainer {
-	@Di.Injectable.Resolved(ThirdWordDependency)
-	protected override readonly DisplayText!: string;
+	public declare DisplayText: string;
+
+	@Di.Injectable.Resolved("SomeWord")
+	public readonly SomeWordToBeResolve!: string;
+
+	@Di.Injectable.Resolved("SomeFunction")
+	public readonly SomeFunctionWouldBeResolved!: () => string;
+		
+	constructor() {
+		super();
+		//Will log "undefined" because object constructor is alwasy ahead of injecting chain
+		console.log(this.SomeWordToBeResolve);
+	}
+
+	public override Render(): Element {
+		// Will correctly log the injected value
+		console.log(this.SomeWordToBeResolve);
+		this.DisplayText = this.SomeWordToBeResolve + " " + this.SomeFunctionWouldBeResolved();
+		return super.Render();
+	}
 }
 
 const Root = new DivContainer();
@@ -65,8 +105,11 @@ const Root = new DivContainer();
  * ===== or =====
  * Root.Children = [new FirstWordContainer(), new SecondWordContainer()];
  */
+
+const shown_later = new ShownLaterThirdWordContainer();
+// console.log(shown_later.DisplayText);
 Root.Add(new FirstWordContainer()).Add(
-	new SecondWordContainer().Add(new FirstWordContainer())
+	new SecondWordContainer().Add(shown_later)
 );
 
 const DependencyContainer = new Di.DependencyContainer.DependencyContainer(
@@ -88,7 +131,7 @@ Framework.Start();
 
 setTimeout(() => {
 	//TODO: Reactive update will be implement later in the framework
-	Root.Add(new ShownLaterThirdWordContainer());
+	// Root.Add(new ShownLaterThirdWordContainer());
 }, 1000);
 
 setTimeout(() => {

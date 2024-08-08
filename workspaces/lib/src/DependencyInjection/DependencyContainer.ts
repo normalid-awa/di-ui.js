@@ -1,8 +1,13 @@
 import "reflect-metadata";
 import { MetadataKeys } from "./Metadata";
 import { Composite } from "../Composite";
+import { Injectable } from "./Injectable";
 
 export module DependencyContainer {
+	class EmulateDepdencyTarget {
+		constructor(private readonly value: any) {}
+	}
+
 	export type DependencyLitralKey = string | symbol;
 	export type DependencyTypeKey<T> = new () => T;
 
@@ -18,21 +23,26 @@ export module DependencyContainer {
 			value: T
 		): this;
 
-		Get<T>(key: DependencyLitralKey | DependencyTypeKey<T>): T;
-
 		/**
 		 * Inject dependencies to the children
 		 */
-		ResolveDependency(): void;
-
-		CacheDependency(): void;
+		ResolveDependencyFromRoot(): void;
 	}
 
 	export class DependencyNotFoundError extends Error {
-		constructor(dependencyKey: string) {
-			super(`Dependency "${dependencyKey}" not found in the registry`);
+		constructor(dependencyKey: string, dependencyTree: IDependencyTree) {
+			super(
+				`Dependency "${dependencyKey}" not found in the dependency tree:[${Array.from(
+					dependencyTree.Dependencies.Cached.keys()
+				).join(", ".toString())}]`
+			);
 		}
 	}
+
+	export type DependenciesMappedType = {
+		Cached: Map<string, Injectable.InjectablePropertyMetadata>;
+		Resolved: Map<string, Injectable.InjectablePropertyMetadata>;
+	};
 
 	//WARN: Not sure this is appropriate to exsite in here
 	// This code must be refactor in the near future, for now it is ok
@@ -40,41 +50,133 @@ export module DependencyContainer {
 	interface IDependencyTree {
 		Parent: IDependencyTree | undefined;
 		Children: IDependencyTree[];
-		Dependencies: Map<string, any>;
+		Dependencies: DependenciesMappedType;
 		Target: Composite.IComposable;
 	}
 
 	export class DependencyContainer implements IDependencyContainer {
 		private readonly injectedTargetRoot: Composite.IComposable;
 
-		private readonly dependencyTree: IDependencyTree;
+		private dependencyTree: IDependencyTree;
 
 		constructor(injectTargetRoot: Composite.IComposable) {
 			this.injectedTargetRoot = injectTargetRoot;
 			this.dependencyTree = {
 				Parent: undefined,
 				Children: [],
-				Dependencies: new Map<string, any>(),
+				Dependencies: {
+					Cached: new Map(),
+					Resolved: new Map(),
+				},
 				Target: injectTargetRoot,
 			};
 		}
 
-		private transformCompositeComponentIntoDependencyTree(
-			root: Composite.IComposable
-		): IDependencyTree {
-			//WARN: structuredClone is not the most performant friendly way to do this, but it's native, so there will be optimization received from v8 or whatever
-			const dependency_tree: IDependencyTree = structuredClone(
-				this.dependencyTree
+		private extractInjectableMetadata(
+			target: object
+		): Record<
+			keyof typeof MetadataKeys,
+			Injectable.InjectablePropertyMetadata[]
+		> {
+			const result: Record<
+				keyof typeof MetadataKeys,
+				Injectable.InjectablePropertyMetadata[]
+			> = {
+				CachedProperty: [],
+				ResolvedProperty: [],
+			};
+			const own_keys = Object.getOwnPropertyNames(target).concat(
+				Object.getOwnPropertyNames(Object.getPrototypeOf(target))
 			);
+			
+			for (const property_key of own_keys)
+				(
+					Object.getOwnPropertyNames(
+						MetadataKeys
+					) as (keyof typeof MetadataKeys)[]
+				).forEach((metakey: keyof typeof MetadataKeys) => {
+					if (
+						Reflect.hasMetadata(
+							MetadataKeys[metakey],
+							target,
+							property_key
+						)
+					) {
+						result[metakey].push({
+							...(Reflect.getMetadata(
+								MetadataKeys[metakey],
+								target,
+								property_key
+							) as Injectable.InjectablePropertyMetadata),
+							//This is because the metadata's target is the obejct i.e. it's not instaniated yet, the target here is the
+							// instaniated object get from the vdom tree.
+							Target: target,
+						});
+					} else if (
+						Reflect.hasOwnMetadata(
+							MetadataKeys[metakey],
+							target,
+							property_key
+						)
+					) {
+						result[metakey].push({
+							...(Reflect.getOwnMetadata(
+								MetadataKeys[metakey],
+								target,
+								property_key
+							) as Injectable.InjectablePropertyMetadata),
+							//This is because the metadata's target is the obejct i.e. it's not instaniated yet, the target here is the
+							// instaniated object get from the vdom tree.
+							Target: target,
+						});
+					}
+				});
+
+			return result;
+		}
+
+		private transformCompositeComponentIntoDependencyTree(
+			root: Composite.IComposable,
+			parentDependencies: DependenciesMappedType = {
+				Cached: new Map(),
+				Resolved: new Map(),
+			}
+		): IDependencyTree {
+			const dependency_tree: IDependencyTree = {
+				Children: [],
+				Dependencies: parentDependencies,
+				Parent: undefined,
+				Target: root,
+			};
 
 			for (const child of root.Children) {
+				const metadatas = this.extractInjectableMetadata(child);
+				const cached = new Map<
+					string,
+					Injectable.InjectablePropertyMetadata
+				>();
+				const resolved = new Map<
+					string,
+					Injectable.InjectablePropertyMetadata
+				>();
+
+				metadatas.CachedProperty.forEach((key) => {
+					cached.set(key.DependencyKey, key);
+				});
+				metadatas.ResolvedProperty.forEach((key) => {
+					resolved.set(key.DependencyKey, key);
+				});
+				const child_dependencies: DependenciesMappedType = {
+					Cached: cached,
+					Resolved: resolved,
+				};
+
 				dependency_tree.Children.push({
 					...this.transformCompositeComponentIntoDependencyTree(
-						child
+						child,
+						child_dependencies
 					),
-					Parent: dependency_tree,
 				});
-				//TODO: dependency properties needs to be setted here
 			}
 
 			return dependency_tree;
@@ -83,43 +185,59 @@ export module DependencyContainer {
 		protected BuildDependencyTree(): IDependencyTree {
 			const dependency_tree =
 				this.transformCompositeComponentIntoDependencyTree(
-					this.injectedTargetRoot
+					this.injectedTargetRoot,
+					this.dependencyTree.Dependencies
 				);
 			return dependency_tree;
 		}
 
-		//TODO: Implement this
-		ResolveDependency(): void {
-			console.log(this.BuildDependencyTree());
-			console.log(this.dependencyTree);
-			// flatern di injection
-			// const flat_children = this.injectedTargetRoot.ExtractChildrenToFlatList();
+		private resolveDependency(
+			target: IDependencyTree,
+			parentDependencies: DependenciesMappedType = {
+				Cached: new Map(),
+				Resolved: new Map(),
+			}
+		): void {
+			for (const child of target.Children) {
+				child.Dependencies.Resolved.forEach((resolveTarget) => {
+					let resolveMetadata:
+						| Injectable.InjectablePropertyMetadata
+						| undefined = parentDependencies.Cached.get(
+						resolveTarget.DependencyKey
+					);
 
-			// for (const child of flat_children) {
-			// 	const own_keys = Object.getOwnPropertyNames(child);
-			// 	for (const property_key of own_keys) {
-			// 		if (
-			// 			Reflect.hasMetadata(
-			// 				MetadataKeys.ResolvedProperty,
-			// 				child,
-			// 				property_key
-			// 			)
-			// 		) {
-			// 			const inject_key: string = Reflect.getMetadata(
-			// 				MetadataKeys.ResolvedProperty,
-			// 				child,
-			// 				property_key
-			// 			) as string;
-			// 			(child as Record<string, any>)[property_key] = this.Get(
-			// 				inject_key
-			// 			) as unknown;
-			// 		}
-			// 	}
-			// }
+					if (resolveMetadata == null)
+						throw new DependencyNotFoundError(
+							resolveTarget.DependencyKey,
+							this.dependencyTree
+						);
+
+					let injectValue = Reflect.get(
+						resolveMetadata.Target,
+						resolveMetadata.TargetPropertyKey
+					) as object | undefined;
+
+					Reflect.set(
+						child.Target,
+						resolveTarget.TargetPropertyKey,
+						injectValue
+					);
+				});
+				parentDependencies.Cached.forEach((v, k) => {
+					child.Dependencies.Cached.set(k, v);
+				});
+
+				this.resolveDependency(child, child.Dependencies);
+			}
 		}
 
-		//TODO: Implement this
-		CacheDependency(): void {}
+		ResolveDependencyFromRoot(): void {
+			this.dependencyTree = this.BuildDependencyTree();
+
+			const global_cache = this.dependencyTree.Dependencies;
+
+			this.resolveDependency(this.dependencyTree, global_cache);
+		}
 
 		private getKeyName(
 			key: DependencyLitralKey | DependencyTypeKey<any>
@@ -127,21 +245,20 @@ export module DependencyContainer {
 			if (typeof key == "symbol" || typeof key == "string")
 				return key.toString();
 			else if (typeof key == "function") return key.name;
-			throw new DependencyNotFoundError(String(key));
+			throw new DependencyNotFoundError(String(key), this.dependencyTree);
 		}
 
 		Provide<T>(
 			key: DependencyLitralKey | DependencyTypeKey<T>,
 			value: T
 		): this {
-			this.dependencyTree.Dependencies.set(this.getKeyName(key), value);
+			const emulate = new EmulateDepdencyTarget(value);
+			this.dependencyTree.Dependencies.Cached.set(this.getKeyName(key), {
+				DependencyKey: key.toString(),
+				Target: emulate,
+				TargetPropertyKey: "value",
+			});
 			return this;
-		}
-
-		Get<T>(key: DependencyLitralKey | DependencyTypeKey<T>): T {
-			return this.dependencyTree.Dependencies.get(
-				this.getKeyName(key)
-			) as T;
 		}
 	}
 }
