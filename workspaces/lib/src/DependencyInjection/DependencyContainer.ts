@@ -1,6 +1,6 @@
 import "reflect-metadata";
 import { MetadataKeys } from "./Metadata";
-import { InjectablePropertyMetadata } from "./Injectable";
+import { IInjectable, InjectablePropertyMetadata } from "./Injectable";
 import { IComposable } from "../Composite";
 
 class EmulateDepdencyTarget {
@@ -70,10 +70,7 @@ export class DependencyContainer implements IDependencyContainer {
 
 	private extractInjectableMetadata(
 		target: object
-	): Record<
-		keyof typeof MetadataKeys,
-		InjectablePropertyMetadata[]
-	> {
+	): Record<keyof typeof MetadataKeys, InjectablePropertyMetadata[]> {
 		const result: Record<
 			keyof typeof MetadataKeys,
 			InjectablePropertyMetadata[]
@@ -147,14 +144,8 @@ export class DependencyContainer implements IDependencyContainer {
 
 		for (const child of root.Children) {
 			const metadatas = this.extractInjectableMetadata(child);
-			const cached = new Map<
-				string,
-				InjectablePropertyMetadata
-			>();
-			const resolved = new Map<
-				string,
-				InjectablePropertyMetadata
-			>();
+			const cached = new Map<string, InjectablePropertyMetadata>();
+			const resolved = new Map<string, InjectablePropertyMetadata>();
 
 			metadatas.CachedProperty.forEach((key) => {
 				cached.set(key.DependencyKey, key);
@@ -196,11 +187,8 @@ export class DependencyContainer implements IDependencyContainer {
 	): void {
 		for (const child of target.Children) {
 			child.Dependencies.Resolved.forEach((resolveTarget) => {
-				let resolveMetadata:
-					| InjectablePropertyMetadata
-					| undefined = parentDependencies.Cached.get(
-					resolveTarget.DependencyKey
-				);
+				let resolveMetadata: InjectablePropertyMetadata | undefined =
+					parentDependencies.Cached.get(resolveTarget.DependencyKey);
 
 				if (resolveMetadata == null)
 					throw new DependencyNotFoundError(
@@ -219,6 +207,9 @@ export class DependencyContainer implements IDependencyContainer {
 					injectValue
 				);
 			});
+			
+			(child.Target as IInjectable).LoadCompleted?.();
+
 			parentDependencies.Cached.forEach((v, k) => {
 				child.Dependencies.Cached.set(k, v);
 			});
