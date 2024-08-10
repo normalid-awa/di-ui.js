@@ -20,11 +20,11 @@ export abstract class AppEntry implements IDrawable {
 
 export class SpaAppEntry extends AppEntry {
 	public override ComponentName: string = "SpaApp";
-protected override RootComponenet: DrawableComponent;
+	protected override RootComponenet: IDrawable;
 
 	public constructor(
 		diContainer: IDependencyContainer,
-		root: DrawableComponent
+		root: IDrawable
 	) {
 		super(diContainer);
 		this.RootComponenet = root;
