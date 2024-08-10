@@ -1,12 +1,19 @@
 /* eslint-disable */
 import "reflect-metadata";
-import Di from "di-ui.js";
+import {
+	Cached,
+	DependencyContainer,
+	DrawableComponent,
+	Framework,
+	Resolved,
+	SpaAppEntry,
+} from "di-ui.js";
 
 const FirstWordDependency: unique symbol = Symbol("FirstWordDependency");
 const SecondWordDependency: unique symbol = Symbol("SecondWordDependency");
 const ThirdWordDependency: unique symbol = Symbol("ThirdWordDependency");
 
-abstract class Container extends Di.Components.DrawableComponent {
+abstract class Container extends DrawableComponent {
 	protected override ElementTag: keyof HTMLElementTagNameMap = "div";
 	override ComponentName: string = "DivContainer";
 }
@@ -42,20 +49,20 @@ class WordContainer extends Container {
 }
 
 class FirstWordContainer extends WordContainer {
-	@Di.Injectable.Resolved(FirstWordDependency)
+	@Resolved(FirstWordDependency)
 	protected declare DisplayText: string;
 }
 
 class SecondWordContainer extends WordContainer {
-	@Di.Injectable.Resolved(SecondWordDependency)
+	@Resolved(SecondWordDependency)
 	declare readonly DisplayText: string;
 
-	@Di.Injectable.Cached("SomeWord")
+	@Cached("SomeWord")
 	private SomeWordToBeCache = "SomeWord";
 
 	private somePrivateWord = "some private word";
 
-	@Di.Injectable.Cached("SomeFunction")
+	@Cached("SomeFunction")
 	public SomeFunctionWouldBeCached() {
 		return `but i can't access private word: ${this.somePrivateWord}, because the dic euraced the "this" keyword :(`;
 	}
@@ -75,12 +82,12 @@ class SecondWordContainer extends WordContainer {
 class ShownLaterThirdWordContainer extends WordContainer {
 	public declare DisplayText: string;
 
-	@Di.Injectable.Resolved("SomeWord")
+	@Resolved("SomeWord")
 	public readonly SomeWordToBeResolve!: string;
 
-	@Di.Injectable.Resolved("SomeFunction")
+	@Resolved("SomeFunction")
 	public readonly SomeFunctionWouldBeResolved!: () => string;
-		
+
 	constructor() {
 		super();
 		//Will log "undefined" because object constructor is alwasy ahead of injecting chain
@@ -90,7 +97,8 @@ class ShownLaterThirdWordContainer extends WordContainer {
 	public override Render(): Element {
 		// Will correctly log the injected value
 		console.log(this.SomeWordToBeResolve);
-		this.DisplayText = this.SomeWordToBeResolve + " " + this.SomeFunctionWouldBeResolved();
+		this.DisplayText =
+			this.SomeWordToBeResolve + " " + this.SomeFunctionWouldBeResolved();
 		return super.Render();
 	}
 }
@@ -112,22 +120,17 @@ Root.Add(new FirstWordContainer()).Add(
 	new SecondWordContainer().Add(shown_later)
 );
 
-const DependencyContainer = new Di.DependencyContainer.DependencyContainer(
-	Root
-);
+const RootDependencyContainer = new DependencyContainer(Root);
 
-DependencyContainer.Provide(FirstWordDependency, "This is the ")
+RootDependencyContainer.Provide(FirstWordDependency, "This is the ")
 	.Provide(SecondWordDependency, ",New era of front-end development!!!")
 	.Provide(ThirdWordDependency, "Dependency injection is awesome!!");
 
-const App = new Di.App.SpaAppEntry(DependencyContainer, Root);
+const App = new SpaAppEntry(RootDependencyContainer, Root);
 
-const Framework = new Di.Framework.Framework(
-	App,
-	document.getElementById("app")!
-);
+const RootFramework = new Framework(App, document.getElementById("app")!);
 
-Framework.Start();
+RootFramework.Start();
 
 setTimeout(() => {
 	//TODO: Reactive update will be implement later in the framework
