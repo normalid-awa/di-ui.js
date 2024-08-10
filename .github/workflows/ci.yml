@@ -34,5 +34,5 @@ jobs:
             - name: Run unit test
               working-directory: ./workspaces/test
               run: |
-                  npm run ci
+                  npm ci
                   npm run test:browser
