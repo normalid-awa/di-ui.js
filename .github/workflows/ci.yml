@@ -1,0 +1,42 @@
+on: [push, pull_request]
+name: Continuous Integration
+concurrency:
+    group: ${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
+
+permissions:
+    contents: read
+
+jobs:
+    lint:
+        name: Check code quality
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: "20.x"
+                  registry-url: "https://registry.npmjs.org"
+            - run: npm ci
+            - name: Run eslint check
+              working-directory: ./workspaces/lib
+              run: npm run lint
+    test:
+        name: Unit test
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: "20.x"
+                  registry-url: "https://registry.npmjs.org"
+            - run: npm ci
+            - name: Build
+              working-directory: ./workspaces/lib
+              run: npm run build
+            - name: Run unit test
+              working-directory: ./workspaces/test
+              run: |
+                  npm ci
+                  npx playwright install
+                  npm run test:browser
