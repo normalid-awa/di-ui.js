@@ -1,7 +1,7 @@
-import { App } from "../App";
+import { AppEntry } from "../App";
 
 export class Framework {
-	private readonly appEntry: App.AppEntry;
+	private readonly appEntry: AppEntry;
 	private readonly root: Element;
 
 	/**
@@ -9,7 +9,7 @@ export class Framework {
 	 * @param app The app entry point, could be SPA or MPA or Custom
 	 * @param pageRoot The root element of the page, mostly is ```document.getElementById("app")```
 	 */
-	constructor(app: App.AppEntry, pageRoot: Element) {
+	constructor(app: AppEntry, pageRoot: Element) {
 		this.appEntry = app;
 		this.root = pageRoot;
 	}

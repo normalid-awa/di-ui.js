@@ -4,7 +4,7 @@ import { IDependencyContainer } from "../DependencyInjection";
 export abstract class AppEntry implements IDrawable {
 	Presented: boolean = false;
 	public ComponentName: string = "App";
-	protected abstract RootComponenet: DrawableComponent;
+	protected abstract RootComponenet: IDrawable;
 	protected Container: IDependencyContainer;
 
 	constructor(diContainer: IDependencyContainer) {
