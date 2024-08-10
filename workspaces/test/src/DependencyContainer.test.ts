@@ -1,5 +1,5 @@
-import { expect, test } from "vitest";
-import { Cached, DependencyContainer, Resolved } from "di-ui.js";
+import { expect, test, vi } from "vitest";
+import { Cached, DependencyContainer, IInjectable, Resolved } from "di-ui.js";
 import { DummyDivContainer } from "./helper";
 
 test("Test Dependency Container Provide/Resolved", () => {
@@ -8,7 +8,7 @@ test("Test Dependency Container Provide/Resolved", () => {
 
 	expect(dic).instanceOf(DependencyContainer);
 	expect(dic.Provide("Something", "Hello")).instanceOf(DependencyContainer);
-	
+
 	class DummyContainerNeedsSomeInjection extends DummyDivContainer {
 		@Resolved("Something")
 		public readonly DependSomething!: string;
@@ -19,15 +19,15 @@ test("Test Dependency Container Provide/Resolved", () => {
 
 	dic.ResolveDependencyFromRoot();
 
-	expect(dummy_instance.DependSomething).eq("Hello")
-})
+	expect(dummy_instance.DependSomething).eq("Hello");
+});
 
 test("Test Dependency Container Cached/Resolved", () => {
 	const root = new DummyDivContainer();
 	const dic = new DependencyContainer(root);
 
 	expect(dic).instanceOf(DependencyContainer);
-	
+
 	class DummyContainerNeedsToCache extends DummyDivContainer {
 		@Cached("Something")
 		public readonly DependSomething: string = "Hello";
@@ -46,6 +46,31 @@ test("Test Dependency Container Cached/Resolved", () => {
 
 	dic.ResolveDependencyFromRoot();
 
-	expect(injuect_dummy_instance.DependSomething).eq("Hello")
-})
+	expect(injuect_dummy_instance.DependSomething).eq("Hello");
+});
 
+test("Test `LoadCompleted` method", () => {
+	const root = new DummyDivContainer();
+	const dic = new DependencyContainer(root).Provide("SomeValue", "Hello");
+
+	expect(dic).instanceOf(DependencyContainer);
+
+	class DummyDiTarget extends DummyDivContainer implements IInjectable {
+		@Resolved("SomeValue")
+		private readonly someValue!: string;
+
+		LoadCompleted(): void {
+			expect(this.someValue).toBe("Hello");
+		}
+	}
+
+	const dummy_instance = new DummyDiTarget();
+
+	vi.spyOn(dummy_instance, "LoadCompleted");
+
+	root.Add(dummy_instance);
+
+	dic.ResolveDependencyFromRoot();
+
+	expect(dummy_instance.LoadCompleted).toBeCalledTimes(1);
+});

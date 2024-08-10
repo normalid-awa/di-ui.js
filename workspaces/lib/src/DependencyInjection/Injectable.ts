@@ -9,7 +9,7 @@ export interface IInjectable {
 	/**
 	 * Call when the dependency is loaded
 	 */
-	LoadComplete?(): void;
+	LoadCompleted?(): void;
 }
 
 // #region Decorators
