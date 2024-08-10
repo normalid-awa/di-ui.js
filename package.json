@@ -8,7 +8,8 @@
 	"type": "module",
 	"workspaces": [
 		"workspaces/lib",
-		"workspaces/example-app"
+		"workspaces/example-app",
+		"workspace/test"
 	],
 	"scripts": {
 		"lint": "eslint .",

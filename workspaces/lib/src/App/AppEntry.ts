@@ -1,4 +1,4 @@
-import { DrawableComponent, IDrawable } from "../Components";
+import {IDrawable } from "../Components";
 import { IDependencyContainer } from "../DependencyInjection";
 
 export abstract class AppEntry implements IDrawable {
