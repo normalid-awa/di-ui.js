@@ -10,6 +10,7 @@ import {
 	SpaAppEntry,
 } from "di-ui.js";
 
+// Setup the dependency key, just like indexing
 const FirstWordDependency: unique symbol = Symbol("FirstWordDependency");
 const SecondWordDependency: unique symbol = Symbol("SecondWordDependency");
 const ThirdWordDependency: unique symbol = Symbol("ThirdWordDependency");
@@ -29,17 +30,27 @@ class DivContainer extends Container {
 		this.CurrentElement!.style.width = "100vw";
 		return this.CurrentElement!;
 	}
+
+	override Dispose(): void {
+		super.Dispose();
+		alert(`oh nooooooooo ${this.ComponentName} is disposing !!`);
+	}
 }
 
-class WordContainer extends Container {
+class WordWraper extends DivContainer {
+	// You can provide dependency via @Cached, this way the dependency can be retrive by the children
+	@Cached(FirstWordDependency)
+	firstWord: string = "Welcome to the";
+}
+
+abstract class WordContainer extends Container {
 	public override ComponentName: string = "WordContainer";
 	protected override ElementTag: keyof HTMLElementTagNameMap = "span";
 	protected override CurrentElement?: HTMLSpanElement;
 
-	protected readonly DisplayText!: string;
+	protected DisplayText!: string;
 
 	public override Render(): Element {
-		// console.log("render", this.DisplayText);
 		super.Render();
 		this.CurrentElement!.style.display = "inline-block";
 		this.CurrentElement!.style.textAlign = "center";
@@ -49,99 +60,56 @@ class WordContainer extends Container {
 	}
 }
 
-class FirstWordContainer extends WordContainer {
+class FirstWordComponent extends WordContainer implements IInjectable {
+	// If you want your display text seperate to the backing
+	// You can create a new property to handle that
 	@Resolved(FirstWordDependency)
-	protected declare DisplayText: string;
-}
-
-class SecondWordContainer extends WordContainer {
-	@Resolved(SecondWordDependency)
-	declare readonly DisplayText: string;
-
-	@Cached("SomeWord")
-	private SomeWordToBeCache = "SomeWord";
-
-	private somePrivateWord = "some private word";
-
-	@Cached("SomeFunction")
-	public SomeFunctionWouldBeCached() {
-		return `but i can't access private word: ${this.somePrivateWord}, because the dic euraced the "this" keyword :(`;
-	}
-
-	constructor() {
-		super();
-		this.SomeWordToBeCache += " " + "Constructor!";
-	}
-
-	public override Render(): Element {
-		// This appended string won't be shown below, because the dic only tracked to constructor
-		this.SomeWordToBeCache += " " + "Render!";
-		return super.Render();
-	}
-}
-
-class ShownLaterThirdWordContainer extends WordContainer implements IInjectable {
-	public declare DisplayText: string;
-
-	@Resolved("SomeWord")
-	public readonly SomeWordToBeResolve!: string;
-
-	@Resolved("SomeFunction")
-	public readonly SomeFunctionWouldBeResolved!: () => string;
-
-	constructor() {
-		super();
-		//Will log "undefined" because object constructor is alwasy ahead of injecting chain
-		console.log(this.SomeWordToBeResolve);
-	}
+	private firstWord!: string;
 
 	LoadCompleted(): void {
-		console.log(`SomeWord was injected with value ${this.SomeWordToBeResolve} !!!`)
-		console.log(`SomeFunction was injected, called and return ${this.SomeFunctionWouldBeResolved()}`)
-	}
-
-	public override Render(): Element {
-		// Will correctly log the injected value
-		console.log(this.SomeWordToBeResolve);
-		this.DisplayText = ""
-		return super.Render();
+		this.DisplayText = this.firstWord;
 	}
 }
 
-const Root = new DivContainer();
+class SecondWordComponent extends WordContainer {
+	// Or just keep it simple by just writing it to the display text property
+	@Resolved(SecondWordDependency)
+	declare DisplayText: string;
+}
 
-/**
- * Few ways to add children :
- * Root.Children.push(new FirstWordContainer(), new SecondWordContainer());
- * ===== or =====
- * Root.Add(new FirstWordContainer(), new SecondWordContainer());
- * ===== or =====
- * Root.Children = [new FirstWordContainer(), new SecondWordContainer()];
- */
+// Get the target dom element we want to render to
+const documentRoot = document.getElementById("app")!;
 
-const shown_later = new ShownLaterThirdWordContainer();
-// console.log(shown_later.DisplayText);
-Root.Add(new FirstWordContainer()).Add(
-	new SecondWordContainer().Add(shown_later)
-);
+// Setup our app root container, children will be added into
+const root = new DivContainer();
 
-const RootDependencyContainer = new DependencyContainer(Root);
+const first_word = new FirstWordComponent();
+const second_word = new SecondWordComponent();
 
-RootDependencyContainer.Provide(FirstWordDependency, "This is the ")
-	.Provide(SecondWordDependency, ",New era of front-end development!!!")
-	.Provide(ThirdWordDependency, "Dependency injection is awesome!!");
+const word_display = new WordWraper().Add(first_word).Add(second_word);
 
-const App = new SpaAppEntry(RootDependencyContainer, Root);
+root.Add(word_display);
 
-const RootFramework = new Framework(App, document.getElementById("app")!);
+// Set up the dependency container so that dependencies can be inject
+// Notice that the first parameter can be any component, As well as they needs d.i.
+const dependencyContainer = new DependencyContainer(root);
 
-RootFramework.Start();
+// You can also provide by using <c>Provide()</c> method on di container, can be retrive globally(inside the scope of di root)
+dependencyContainer.Provide(SecondWordDependency, "New era!");
 
-setTimeout(() => {
-	//TODO: Reactive update will be implement later in the framework
-	// Root.Add(new ShownLaterThirdWordContainer());
-}, 1000);
+// Setup our app by passing our dependency container and root component.
+const app = new SpaAppEntry(dependencyContainer, root);
 
-setTimeout(() => {
-	Root.Dispose();
-}, 100000);
+// Lastly can now start the app!
+new Framework(app, documentRoot).Start();
+
+async function delay(ms: number) {
+	return new Promise((s) => setTimeout(s, ms));
+}
+
+(async () => {
+	await delay(10000);
+	first_word.Dispose();
+	await delay(10000);
+	second_word.Dispose();
+})();
