@@ -35,4 +35,5 @@ jobs:
               working-directory: ./workspaces/test
               run: |
                   npm ci
+                  npx playwright install
                   npm run test:browser
