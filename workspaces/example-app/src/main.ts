@@ -5,6 +5,7 @@ import {
 	DependencyContainer,
 	DrawableComponent,
 	Framework,
+	IInjectable,
 	Resolved,
 	SpaAppEntry,
 } from "di-ui.js";
@@ -79,7 +80,7 @@ class SecondWordContainer extends WordContainer {
 	}
 }
 
-class ShownLaterThirdWordContainer extends WordContainer {
+class ShownLaterThirdWordContainer extends WordContainer implements IInjectable {
 	public declare DisplayText: string;
 
 	@Resolved("SomeWord")
@@ -94,11 +95,15 @@ class ShownLaterThirdWordContainer extends WordContainer {
 		console.log(this.SomeWordToBeResolve);
 	}
 
+	LoadCompleted(): void {
+		console.log(`SomeWord was injected with value ${this.SomeWordToBeResolve} !!!`)
+		console.log(`SomeFunction was injected, called and return ${this.SomeFunctionWouldBeResolved()}`)
+	}
+
 	public override Render(): Element {
 		// Will correctly log the injected value
 		console.log(this.SomeWordToBeResolve);
-		this.DisplayText =
-			this.SomeWordToBeResolve + " " + this.SomeFunctionWouldBeResolved();
+		this.DisplayText = ""
 		return super.Render();
 	}
 }
