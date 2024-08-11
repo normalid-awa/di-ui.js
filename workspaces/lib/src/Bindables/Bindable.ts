@@ -1,5 +1,13 @@
 import { IHasDefaultValue } from "../Interfaces";
 
+export class CouldNotSetValueToAbindedBindableError extends Error {
+	constructor() {
+		super(
+			"Could not set value on a bindable that already bind to others, use Bindable.GetEditableCopy() to set value"
+		);
+	}
+}
+
 export interface IValueChangedEvent<T> {
 	OldValue: T;
 	NewValue: T;
@@ -27,10 +35,13 @@ export interface IBindable<T> extends IHasDefaultValue<T> {
 }
 
 export class Bindable<T> implements IBindable<T> {
-	private readonly valueChangedCallbackFunctions: ValueChangedCallback<T>[] = [];
-	private readonly defaultValueChangedCallbackFunctions: ValueChangedCallback<T>[] = [];
-	private readonly bindings: IBindable<T>[] = [];
+	private readonly valueChangedCallbackFunctions: ValueChangedCallback<T>[] =
+		[];
+	private readonly defaultValueChangedCallbackFunctions: ValueChangedCallback<T>[] =
+		[];
+	private readonly bindings: Bindable<T>[] = [];
 	private readonly bindTargetId: number = -1;
+	private isEditableCopy: boolean = false;
 
 	private defaultValue: T;
 	get DefaultValue(): T {
@@ -52,6 +63,13 @@ export class Bindable<T> implements IBindable<T> {
 		return this.value;
 	}
 	set Value(newValue: T) {
+		console.log(`from ${this.value} set to ${newValue}`);
+		if (this.BindTarget && !this.isEditableCopy)
+			throw new CouldNotSetValueToAbindedBindableError();
+		if (this.BindTarget && this.isEditableCopy) {
+			this.BindTarget.Value = newValue;
+			return;
+		}
 		if (this.value === newValue) return;
 		this.triggerValueChangeEvent(this.value, newValue);
 		this.value = newValue;
@@ -71,7 +89,8 @@ export class Bindable<T> implements IBindable<T> {
 		});
 
 		this.bindings.forEach((target) => {
-			target.Value = newVal;
+			if (target.BindTarget == this) target.value = newVal;
+			else target.Value = newVal;
 		});
 	}
 
@@ -82,7 +101,7 @@ export class Bindable<T> implements IBindable<T> {
 		this.valueChangedCallbackFunctions.push(callback);
 		if (runImmediately)
 			callback({
-				OldValue: undefined as T,
+				OldValue: this.value,
 				NewValue: this.value,
 			});
 	}
@@ -118,7 +137,7 @@ export class Bindable<T> implements IBindable<T> {
 		target.DefaultValue = this.DefaultValue;
 	}
 
-	protected ReferenceTo(target: IBindable<T>): number {
+	protected ReferenceTo(target: Bindable<T>): number {
 		return this.bindings.push(target);
 	}
 
@@ -127,15 +146,23 @@ export class Bindable<T> implements IBindable<T> {
 	}
 
 	BindTo(target: Bindable<T>): void {
-		this.Unbind();
-		this.bindTarget = target;
+		if (this.BindTarget) this.Unbind();
 
 		target.CopyTo(this);
 		target.ReferenceTo(this);
+
+		this.bindTarget = target;
 	}
 
 	Unbind(): void {
 		this.bindTarget?.DereferenceTo(this.bindTargetId);
 		this.bindTarget = undefined;
+	}
+
+	GetEditableCopy(): Bindable<T> {
+		const bind = new Bindable<T>(this.defaultValue);
+		bind.isEditableCopy = true;
+		bind.BindTo(this);
+		return bind;
 	}
 }
