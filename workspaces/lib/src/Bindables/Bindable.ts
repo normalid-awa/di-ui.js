@@ -63,7 +63,6 @@ export class Bindable<T> implements IBindable<T> {
 		return this.value;
 	}
 	set Value(newValue: T) {
-		console.log(`from ${this.value} set to ${newValue}`);
 		if (this.BindTarget && !this.isEditableCopy)
 			throw new CouldNotSetValueToAbindedBindableError();
 		if (this.BindTarget && this.isEditableCopy) {
