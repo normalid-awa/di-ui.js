@@ -25,7 +25,7 @@ export interface IComposable {
 	 * Remove a child or children from the component
 	 * @param item
 	 */
-	Remove(item: IComposable | IComposable[]): void;
+	Remove(item: IComposable | IComposable[]): this;
 
 	/**
 	 * Detach the component from its parent
@@ -63,7 +63,7 @@ export abstract class Componenet implements IComposable {
 		return this;
 	}
 
-	public Remove(item: IComposable | IComposable[]): void {
+	public Remove(item: IComposable | IComposable[]): this {
 		const remove = (singleItem: IComposable): void => {
 			if (!this.Children.includes(singleItem))
 				throw new ComponentNotFound(JSON.stringify(singleItem));
@@ -74,6 +74,8 @@ export abstract class Componenet implements IComposable {
 
 		if (Array.isArray(item)) item.forEach((child) => void remove(child));
 		else remove(item);
+
+		return this;
 	}
 
 	public Detach(): void {
