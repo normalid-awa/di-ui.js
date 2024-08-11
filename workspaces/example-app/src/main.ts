@@ -76,7 +76,7 @@ class FirstWordComponent extends WordContainer implements IInjectable {
 }
 
 class SecondWordComponent extends WordContainer implements IInjectable {
-	// Or just keep it simple by just writing it to the display text property
+	// Or just keep it simple by just resolve the dependency with a decorator
 	@Resolved(SecondWordDependency)
 	private relayBinding!: Bindable<string>;
 
@@ -95,7 +95,7 @@ class SecondWordComponent extends WordContainer implements IInjectable {
 		// Use `Unbind` method to disconnect bindings
 		setTimeout(() => {
 			this.secondWord.Unbind();
-			this.secondWord.Value = "The binding was disconnected"
+			this.secondWord.Value = "The binding was disconnected";
 		}, 5000);
 	}
 }
@@ -134,7 +134,9 @@ async function delay(ms: number) {
 
 async function updateSecondWordText() {
 	await delay(100);
-	second_word_value.Value = `${Math.random().toFixed(2)} Bindable<T> can perform reactive action!`;
+	second_word_value.Value = `${Math.random().toFixed(
+		2
+	)} Bindable<T> can perform reactive action!`;
 	updateSecondWordText();
 }
 
