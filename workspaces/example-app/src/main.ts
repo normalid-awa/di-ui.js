@@ -1,6 +1,7 @@
 /* eslint-disable */
 import "reflect-metadata";
 import {
+	Bindable,
 	Cached,
 	DependencyContainer,
 	DrawableComponent,
@@ -9,6 +10,8 @@ import {
 	Resolved,
 	SpaAppEntry,
 } from "di-ui.js";
+
+import type { IBindable } from "di-ui.js";
 
 // Setup the dependency key, just like indexing
 const FirstWordDependency: unique symbol = Symbol("FirstWordDependency");
@@ -37,7 +40,8 @@ class DivContainer extends Container {
 	}
 }
 
-class WordWraper extends DivContainer {
+class WordWrapper extends DivContainer {
+	override ComponentName: string = "WordWrapper";
 	// You can provide dependency via @Cached, this way the dependency can be retrive by the children
 	@Cached(FirstWordDependency)
 	firstWord: string = "Welcome to the";
@@ -55,7 +59,7 @@ abstract class WordContainer extends Container {
 		this.CurrentElement!.style.display = "inline-block";
 		this.CurrentElement!.style.textAlign = "center";
 		this.CurrentElement!.style.width = "50vw";
-		this.CurrentElement!.prepend(document.createTextNode(this.DisplayText));
+		this.CurrentElement!.innerText = this.DisplayText;
 		return this.CurrentElement!;
 	}
 }
@@ -71,10 +75,29 @@ class FirstWordComponent extends WordContainer implements IInjectable {
 	}
 }
 
-class SecondWordComponent extends WordContainer {
+class SecondWordComponent extends WordContainer implements IInjectable {
 	// Or just keep it simple by just writing it to the display text property
 	@Resolved(SecondWordDependency)
-	declare DisplayText: string;
+	private relayBinding!: Bindable<string>;
+
+	private secondWord: Bindable<string> = new Bindable<string>("");
+
+	LoadCompleted(): void {
+		this.secondWord.BindTo(this.relayBinding);
+		// Update dom element text with bindable, notice that the second argument is true,
+		// it means will perform the callback immediately when the callback was just register
+		this.secondWord.OnValueChanged((v) => {
+			this.DisplayText = v.NewValue;
+			if (this.CurrentElement)
+				this.CurrentElement!.innerText = this.DisplayText;
+		}, true);
+
+		// Use `Unbind` method to disconnect bindings
+		setTimeout(() => {
+			this.secondWord.Unbind();
+			this.secondWord.Value = "The binding was disconnected"
+		}, 5000);
+	}
 }
 
 // Get the target dom element we want to render to
@@ -86,7 +109,7 @@ const root = new DivContainer();
 const first_word = new FirstWordComponent();
 const second_word = new SecondWordComponent();
 
-const word_display = new WordWraper().Add(first_word).Add(second_word);
+const word_display = new WordWrapper().Add(first_word).Add(second_word);
 
 root.Add(word_display);
 
@@ -94,8 +117,10 @@ root.Add(word_display);
 // Notice that the first parameter can be any component, As well as they needs d.i.
 const dependencyContainer = new DependencyContainer(root);
 
+const second_word_value = new Bindable<string>("New era!");
+
 // You can also provide by using <c>Provide()</c> method on di container, can be retrive globally(inside the scope of di root)
-dependencyContainer.Provide(SecondWordDependency, "New era!");
+dependencyContainer.Provide(SecondWordDependency, second_word_value);
 
 // Setup our app by passing our dependency container and root component.
 const app = new SpaAppEntry(dependencyContainer, root);
@@ -107,9 +132,18 @@ async function delay(ms: number) {
 	return new Promise((s) => setTimeout(s, ms));
 }
 
+async function updateSecondWordText() {
+	await delay(100);
+	second_word_value.Value = `${Math.random().toFixed(2)} Bindable<T> can perform reactive action!`;
+	updateSecondWordText();
+}
+
+updateSecondWordText();
+
 (async () => {
-	await delay(10000);
+	await delay(30000);
 	first_word.Dispose();
 	await delay(10000);
 	second_word.Dispose();
+	root.Dispose();
 })();
