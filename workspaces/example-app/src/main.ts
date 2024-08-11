@@ -89,7 +89,7 @@ class SecondWordComponent extends WordContainer implements IInjectable {
 		this.secondWord.OnValueChanged((v) => {
 			this.DisplayText = v.NewValue;
 			if (this.CurrentElement)
-				this.CurrentElement!.innerText = this.DisplayText;
+				this.CurrentElement.innerText = this.DisplayText;
 		}, true);
 
 		// Use `Unbind` method to disconnect bindings

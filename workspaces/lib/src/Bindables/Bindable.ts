@@ -88,8 +88,10 @@ export class Bindable<T> implements IBindable<T> {
 		});
 
 		this.bindings.forEach((target) => {
-			if (target.BindTarget == this) target.value = newVal;
-			else target.Value = newVal;
+			if (target.BindTarget == this) {
+				target.value = newVal;
+				target.triggerValueChangeEvent(oldVal, newVal);
+			} else target.Value = newVal;
 		});
 	}
 
