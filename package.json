@@ -9,6 +9,7 @@
 	"workspaces": [
 		"workspaces/lib",
 		"workspaces/example-app",
+		"workspace/example-app-todo-list",
 		"workspace/test"
 	],
 	"scripts": {

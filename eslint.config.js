@@ -20,7 +20,7 @@ export default [
 		plugins: {
 			"@typescript-eslint": plugin,
 		},
-		ignores: ["node_modules/**", "dist/**"],
+		ignores: ["node_modules/**", "dist/**", "workspaces/example-*/**"],
 		rules: {
 			"@typescript-eslint/naming-convention": [
 				"error",
