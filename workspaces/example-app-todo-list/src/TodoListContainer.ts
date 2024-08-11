@@ -1,5 +1,27 @@
-import { Cached, DrawableComponent } from "di-ui.js";
+import { Cached, DrawableComponent, Resolved } from "di-ui.js";
 import { MarkAsCompleteDependencyKey, TodoListItem } from "./TodoListItem";
+
+const AddNewTodoItemDependencyKey = Symbol("AddNewTodoItemDependencyKey");
+
+export class TodoListAddButton extends DrawableComponent {
+	ComponentName: string = "TodoListAddButton";
+	protected ElementTag: keyof HTMLElementTagNameMap = "button";
+	protected CurrentElement?: HTMLButtonElement | undefined;
+
+	@Resolved(AddNewTodoItemDependencyKey)
+	private addItem!: (name: string) => void;
+
+	Render(): Element {
+		super.Render();
+		this.CurrentElement!.textContent = "Add new todo item";
+		this.CurrentElement!.onclick = () => {
+			const result = prompt("Todo item:", "name");
+			if (!result) return;
+			this.addItem(result);
+		};
+		return this.CurrentElement!;
+	}
+}
 
 export class TodoListContainer extends DrawableComponent {
 	ComponentName: string = "TodoListContainer";
@@ -11,21 +33,27 @@ export class TodoListContainer extends DrawableComponent {
 	@Cached(MarkAsCompleteDependencyKey)
 	setComplete = (index: number) => {
 		this.todoList.splice(index, 1);
-		console.log(index, this.todoList);
-		this.updateTodoList();
-		this.CurrentElement = this.Render();
+		this.refreshTodoList();
 	};
 
-	updateTodoList() {
+	@Cached(AddNewTodoItemDependencyKey)
+	addItem = (name: string) => {
+		this.todoList.push(name);
+		this.refreshTodoList();
+	};
+
+	refreshTodoList() {
 		this.Children.forEach((v) => v.Dispose());
-		this.todoList.forEach((v, k) => {
-			this.Add(new TodoListItem(v, k));
+		this.Children = this.todoList.map((v, k) => {
+			return new TodoListItem(v, k);
 		});
+		this.Add(new TodoListAddButton());
+		this.Update();
 	}
 
 	constructor() {
 		super();
-		this.updateTodoList();
+		this.refreshTodoList();
 	}
 
 	Render(): Element {
