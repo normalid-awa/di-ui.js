@@ -21,11 +21,11 @@ export interface IBindable<T> extends IHasDefaultValue<T> {
 	BindTo(target: IBindable<T>): void;
 	OnValueChanged(
 		callback: ValueChangedCallback<T>,
-		runImmediately: boolean
+		runImmediately?: boolean
 	): void;
 	OnDefaultValueChanged(
 		callback: ValueChangedCallback<T>,
-		runImmediately: boolean
+		runImmediately?: boolean
 	): void;
 	/**
 	 * Will unbind from BindTarget
@@ -97,7 +97,7 @@ export class Bindable<T> implements IBindable<T> {
 
 	OnValueChanged(
 		callback: ValueChangedCallback<T>,
-		runImmediately: boolean
+		runImmediately: boolean = false,
 	): void {
 		this.valueChangedCallbackFunctions.push(callback);
 		if (runImmediately)
@@ -122,7 +122,7 @@ export class Bindable<T> implements IBindable<T> {
 
 	OnDefaultValueChanged(
 		callback: ValueChangedCallback<T>,
-		runImmediately: boolean
+		runImmediately: boolean = false,
 	): void {
 		this.defaultValueChangedCallbackFunctions.push(callback);
 		if (runImmediately) {
