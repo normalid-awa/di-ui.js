@@ -50,14 +50,5 @@
 		"dev": "vite build --watch",
 		"build": "vite build",
 		"doc": "typedoc --options typedoc.config.cjs"
-	},
-	"devDependencies": {
-		"typedoc": "^0.26.5",
-		"typescript": "^5.5.4",
-		"vite": "^5.3.5",
-		"vite-plugin-dts": "^4.0.0-beta.2"
-	},
-	"dependencies": {
-		"reflect-metadata": "^0.2.2"
 	}
 }

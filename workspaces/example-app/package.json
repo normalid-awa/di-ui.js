@@ -7,8 +7,5 @@
 		"dev": "vite",
 		"build": "tsc && vite build",
 		"preview": "vite preview"
-	},
-	"dependencies": {
-		"di-ui.js": "^1.0.0"
 	}
 }
