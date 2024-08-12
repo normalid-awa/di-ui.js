@@ -1,4 +1,3 @@
-import { DrawableComponent } from "di-ui.js";
 import { expect, test, vi } from "vitest";
 import { DummyDivContainer } from "./helper";
 
