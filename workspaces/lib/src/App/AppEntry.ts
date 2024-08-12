@@ -1,18 +1,25 @@
 import {IDrawable } from "../Components";
-import { IDependencyContainer } from "../DependencyInjection";
+import { Cached, DependencyContainer, IDependencyContainer } from "../DependencyInjection";
 
 export abstract class AppEntry implements IDrawable {
-	Presented: boolean = false;
+	IsAlive: boolean = false;
 	public ComponentName: string = "App";
 	protected abstract RootComponenet: IDrawable;
+	
+	@Cached(() => DependencyContainer)
 	protected Container: IDependencyContainer;
 
 	constructor(diContainer: IDependencyContainer) {
 		this.Container = diContainer;
 	}
+	
+	Update(): void {
+		this.Container.ResolveDependencyFromRoot();
+	}
+
 
 	public Render(): Element {
-		this.Presented = true;
+		this.IsAlive = true;
 		this.Container.ResolveDependencyFromRoot();
 		return this.RootComponenet.Render();
 	}
