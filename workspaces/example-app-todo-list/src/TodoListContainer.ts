@@ -1,5 +1,9 @@
 import { Cached, DrawableComponent, Resolved } from "di-ui.js";
-import { MarkAsCompleteDependencyKey, TodoListItem } from "./TodoListItem";
+import {
+	DeleteItemDependencyKey,
+	ToggleItemCompleteDependencyKey,
+	TodoListItem,
+} from "./TodoListItem";
 
 const AddNewTodoItemDependencyKey = Symbol("AddNewTodoItemDependencyKey");
 
@@ -26,26 +30,38 @@ export class TodoListAddButton extends DrawableComponent {
 export class TodoListContainer extends DrawableComponent {
 	ComponentName: string = "TodoListContainer";
 	protected ElementTag: keyof HTMLElementTagNameMap = "div";
-	protected CurrentElement?: Element | undefined;
+	protected CurrentElement?: HTMLDivElement | undefined;
 
-	private todoList: string[] = ["A", "B"];
+	private todoList: {
+		text: string;
+		completed: boolean;
+	}[] = [];
 
-	@Cached(MarkAsCompleteDependencyKey)
-	setComplete = (index: number) => {
+	@Cached(DeleteItemDependencyKey)
+	deleteItem = (index: number) => {
 		this.todoList.splice(index, 1);
+		this.refreshTodoList();
+	};
+
+	@Cached(ToggleItemCompleteDependencyKey)
+	toggleItemComplete = (index: number) => {
+		this.todoList[index].completed = !this.todoList[index].completed;
 		this.refreshTodoList();
 	};
 
 	@Cached(AddNewTodoItemDependencyKey)
 	addItem = (name: string) => {
-		this.todoList.push(name);
+		this.todoList.push({
+			completed: false,
+			text: name,
+		});
 		this.refreshTodoList();
 	};
 
 	refreshTodoList() {
 		this.Children.forEach((v) => v.Dispose());
 		this.Children = this.todoList.map((v, k) => {
-			return new TodoListItem(v, k);
+			return new TodoListItem(v.text, v.completed, k);
 		});
 		this.Add(new TodoListAddButton());
 		this.Update();
@@ -58,7 +74,12 @@ export class TodoListContainer extends DrawableComponent {
 
 	Render(): Element {
 		super.Render();
-		this.CurrentElement?.prepend("Todo list:");
+		this.CurrentElement!.style.textAlign = "center";
+		this.CurrentElement!.style.display = "flex";
+		this.CurrentElement!.style.flexDirection = "column";
+		this.CurrentElement!.style.maxWidth = "400px";
+		this.CurrentElement!.style.margin = "auto";
+		this.CurrentElement!.prepend("Todo list:");
 		return this.CurrentElement!;
 	}
 }
