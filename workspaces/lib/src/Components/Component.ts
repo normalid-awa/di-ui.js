@@ -3,9 +3,18 @@ import { DependencyContainer, Resolved } from "../DependencyInjection";
 import { ICanUpdate } from "../Interfaces";
 import { HTMLTags } from "../types";
 
+/**
+ * Represent the class can be drew
+ */
 export interface IDrawable {
+	/**
+	 * The readable component name that appears to devtool
+	 */
 	readonly componentName: string;
 
+	/**
+	 * Whether the component was dispose
+	 */
 	isAlive: boolean;
 
 	/**
@@ -14,6 +23,9 @@ export interface IDrawable {
 	render(): Element;
 }
 
+/**
+ * The base class of the drawable component
+ */
 export abstract class DrawableComponent
 	extends Componenet
 	implements IDrawable, IComposable, ICanUpdate

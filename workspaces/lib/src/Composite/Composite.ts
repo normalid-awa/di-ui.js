@@ -4,6 +4,9 @@ export class ComponentNotFound extends Error {
 	}
 }
 
+/**
+ * Represent the class can be composite
+ */
 export interface IComposable {
 	/**
 	 * The parent of this component, undefined means it's the root
@@ -40,6 +43,9 @@ export interface IComposable {
 	extractChildrenToFlatList(): IComposable[];
 }
 
+/**
+ * The implementation of `IComposable`
+ */
 export abstract class Componenet implements IComposable {
 	public parent: IComposable | undefined;
 

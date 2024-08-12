@@ -1,11 +1,13 @@
 import { AppEntry } from "../App";
 
+/**
+ * The class that hold app entry and real dom
+ */
 export class Framework {
 	private readonly appEntry: AppEntry;
 	private readonly root: Element;
 
 	/**
-	 *
 	 * @param app The app entry point, could be SPA or MPA or Custom
 	 * @param pageRoot The root element of the page, mostly is ```document.getElementById("app")```
 	 */

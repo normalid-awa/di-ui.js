@@ -1,5 +1,8 @@
 import { IHasDefaultValue } from "../Interfaces";
 
+/**
+ * When the bindable was bind to the others, and the value of the bind was change, this error would be thrown
+ */
 export class CouldNotSetValueToAbindedBindableError extends Error {
 	constructor() {
 		super(
@@ -16,21 +19,51 @@ export interface IValueChangedEvent<T> {
 export type ValueChangedCallback<T> = (event: IValueChangedEvent<T>) => unknown;
 
 export interface IBindable<T> extends IHasDefaultValue<T> {
+	/**
+	 * The value of the binding
+	 */
 	value: T;
+
+	/**
+	 * The bind target of the bind, null when it didn't bind o other
+	 */
 	readonly bindTarget?: IBindable<T>;
+
+	/**
+	 * Bind this binding to other, the value will be synced
+	 * @param target
+	 */
 	bindTo(target: IBindable<T>): void;
+
+	/**
+	 * Register a callback to the value change event
+	 * @param callback the callback function when the value was change
+	 * @param runImmediately will it run once just after the event was register?
+	 */
 	onValueChanged(
 		callback: ValueChangedCallback<T>,
 		runImmediately?: boolean
 	): void;
+
+	/**
+	 * Register a callback to the default value change event
+	 * @param callback the callback function when the default value was change
+	 * @param runImmediately will it run once just after the event was register?
+	 */
 	onDefaultValueChanged(
 		callback: ValueChangedCallback<T>,
 		runImmediately?: boolean
 	): void;
+
 	/**
-	 * Will unbind from BindTarget
+	 * Will unbind from BindTarget, and the value will not longer be sync.
 	 */
 	unbind(): void;
+
+	/**
+	 * Copy the value and defualt value to the target, can be useful when the value only need to be sync once
+	 * @param target the target binding
+	 */
 	copyTo(target: IBindable<T>): void;
 }
 
@@ -97,7 +130,7 @@ export class Bindable<T> implements IBindable<T> {
 
 	onValueChanged(
 		callback: ValueChangedCallback<T>,
-		runImmediately: boolean = false,
+		runImmediately: boolean = false
 	): void {
 		this.valueChangedCallbackFunctions.push(callback);
 		if (runImmediately)
@@ -122,7 +155,7 @@ export class Bindable<T> implements IBindable<T> {
 
 	onDefaultValueChanged(
 		callback: ValueChangedCallback<T>,
-		runImmediately: boolean = false,
+		runImmediately: boolean = false
 	): void {
 		this.defaultValueChangedCallbackFunctions.push(callback);
 		if (runImmediately) {

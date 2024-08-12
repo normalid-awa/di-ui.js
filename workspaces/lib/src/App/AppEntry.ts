@@ -1,6 +1,9 @@
-import {IDrawable } from "../Components";
-import { Cached, DependencyContainer, IDependencyContainer } from "../DependencyInjection";
+import { IDrawable } from "../Components";
+import { IDependencyContainer } from "../DependencyInjection";
 
+/**
+ * Where the app will be start and render
+ */
 export abstract class AppEntry implements IDrawable {
 	isAlive: boolean = false;
 	public componentName: string = "App";
@@ -11,6 +14,10 @@ export abstract class AppEntry implements IDrawable {
 		this.container = diContainer;
 	}
 
+	/**
+	 * Render the root element
+	 * @returns The final output of all the children being render
+	 */
 	public render(): Element {
 		this.isAlive = true;
 		this.container.resolveDependencyFromRoot();
@@ -18,6 +25,9 @@ export abstract class AppEntry implements IDrawable {
 	}
 }
 
+/**
+ * SPA App
+ */
 export class SpaAppEntry extends AppEntry {
 	public override componentName: string = "SpaApp";
 	protected override rootComponenet: IDrawable;

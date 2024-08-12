@@ -3,28 +3,47 @@ import { MetadataKeys } from "./Metadata";
 import { IInjectable, InjectablePropertyMetadata } from "./Injectable";
 import { IComposable } from "../Composite";
 
+/**
+ * Used internally in dependency container, used to emulate the class reference
+ */
 class EmulateDepdencyTarget {
 	constructor(private readonly value: any) {}
 }
 
+/**
+ * The litral index of a dependency
+ */
 export type DependencyLitralKey = string | symbol;
+/**
+ * The type index of a dependency
+ * @example Resolved(() => SomeClass)
+ */
 export type DependencyTypeKey<T> = new () => T;
 
+/**
+ * The interface of a dependency container
+ */
 export interface IDependencyContainer {
 	/**
 	 * Provide the value to the container ``` ProvideType.Value ```
 	 * WARN: As you directly pass by this method, it will be available globally
 	 * @param key the unique key of the dependency, RECOMMENDED to use symbol
 	 * @param value any thing you want to store
+	 * @example
+	 * const UsernameDependency = Symbol("username")
+	 * dependencyContainer.provide(UsernameDependencyKey, "bob")
 	 */
 	provide<T>(key: DependencyLitralKey | DependencyTypeKey<T>, value: T): this;
 
 	/**
-	 * Inject dependencies to the children
+	 * Inject dependencies to the root and all of its children
 	 */
 	resolveDependencyFromRoot(): void;
 }
 
+/**
+ * Represent the dependency not found with the index you provide
+ */
 export class DependencyNotFoundError extends Error {
 	constructor(dependencyKey: string, dependencyTree: IDependencyTree) {
 		super(
@@ -43,14 +62,32 @@ type DependenciesMappedType = {
 //WARN: Not sure this is appropriate to exsite in here
 // This code must be refactor in the near future, for now it is ok
 // As long as the development, this will become a huge tech debt.
+/**
+ * The dependency tree, used by DependencyContainer internally
+ */
 interface IDependencyTree {
+	/**
+	 * parent node
+	 */
 	parent: IDependencyTree | undefined;
+	/**
+	 * children node
+	 */
 	children: IDependencyTree[];
+	/**
+	 * recorded dependency
+	 */
 	dependencies: DependenciesMappedType;
+	/**
+	 * the mirror of current node
+	 */
 	target: IComposable;
 }
 
 export class DependencyContainer implements IDependencyContainer {
+	/**
+	 * The target root of the resolved root
+	 */
 	private readonly injectedTargetRoot: IComposable;
 
 	private dependencyTree: IDependencyTree;
@@ -175,6 +212,10 @@ export class DependencyContainer implements IDependencyContainer {
 		return dependency_tree;
 	}
 
+	/**
+	 * Build the dependency from the root
+	 * @returns the generated tree
+	 */
 	protected buildDependencyTree(): IDependencyTree {
 		const dependency_tree =
 			this.transformCompositeComponentIntoDependencyTree(
