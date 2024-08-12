@@ -7,19 +7,20 @@ test("Test Dependency Container Provide/Resolved", () => {
 	const dic = new DependencyContainer(root);
 
 	expect(dic).instanceOf(DependencyContainer);
-	expect(dic.Provide("Something", "Hello")).instanceOf(DependencyContainer);
+	expect(dic.provide("Something", "Hello")).instanceOf(DependencyContainer);
 
 	class DummyContainerNeedsSomeInjection extends DummyDivContainer {
+		componentName: string = "DummyContainer";
 		@Resolved("Something")
-		public readonly DependSomething!: string;
+		public readonly dependSomething!: string;
 	}
 
 	const dummy_instance = new DummyContainerNeedsSomeInjection();
-	root.Add(dummy_instance);
+	root.add(dummy_instance);
 
-	dic.ResolveDependencyFromRoot();
+	dic.resolveDependencyFromRoot();
 
-	expect(dummy_instance.DependSomething).eq("Hello");
+	expect(dummy_instance.dependSomething).eq("Hello");
 });
 
 test("Test Dependency Container Cached/Resolved", () => {
@@ -29,48 +30,51 @@ test("Test Dependency Container Cached/Resolved", () => {
 	expect(dic).instanceOf(DependencyContainer);
 
 	class DummyContainerNeedsToCache extends DummyDivContainer {
+		componentName: string = "DummyContainer";
 		@Cached("Something")
-		public readonly DependSomething: string = "Hello";
+		public readonly dependSomething: string = "Hello";
 	}
 
 	class DummyContainerNeedsSomeInjection extends DummyDivContainer {
+		componentName: string = "DummyContainer";
 		@Resolved("Something")
-		public readonly DependSomething!: string;
+		public readonly dependSomething!: string;
 	}
 
 	const root_dummy_instance = new DummyContainerNeedsToCache();
 	const injuect_dummy_instance = new DummyContainerNeedsSomeInjection();
 
-	root_dummy_instance.Add(injuect_dummy_instance);
-	root.Add(root_dummy_instance);
+	root_dummy_instance.add(injuect_dummy_instance);
+	root.add(root_dummy_instance);
 
-	dic.ResolveDependencyFromRoot();
+	dic.resolveDependencyFromRoot();
 
-	expect(injuect_dummy_instance.DependSomething).eq("Hello");
+	expect(injuect_dummy_instance.dependSomething).eq("Hello");
 });
 
 test("Test `LoadCompleted` method", () => {
 	const root = new DummyDivContainer();
-	const dic = new DependencyContainer(root).Provide("SomeValue", "Hello");
+	const dic = new DependencyContainer(root).provide("SomeValue", "Hello");
 
 	expect(dic).instanceOf(DependencyContainer);
 
 	class DummyDiTarget extends DummyDivContainer implements IInjectable {
+		componentName: string = "DummyContainer";
 		@Resolved("SomeValue")
 		private readonly someValue!: string;
 
-		LoadCompleted(): void {
+		loadCompleted(): void {
 			expect(this.someValue).toBe("Hello");
 		}
 	}
 
 	const dummy_instance = new DummyDiTarget();
 
-	vi.spyOn(dummy_instance, "LoadCompleted");
+	vi.spyOn(dummy_instance, "loadCompleted");
 
-	root.Add(dummy_instance);
+	root.add(dummy_instance);
 
-	dic.ResolveDependencyFromRoot();
+	dic.resolveDependencyFromRoot();
 
-	expect(dummy_instance.LoadCompleted).toBeCalledTimes(1);
+	expect(dummy_instance.loadCompleted).toBeCalledTimes(1);
 });
