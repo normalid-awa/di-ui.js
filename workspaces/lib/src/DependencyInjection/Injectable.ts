@@ -40,6 +40,7 @@ export function Resolved(
  */
 export function Cached(injectKey: string | symbol | Typed): PropertyDecorator {
 	if (typeof injectKey == "function") {
+		//@ts-ignore
 		injectKey = injectKey().prototype.constructor.name as string;
 	}
 	return (target: Object, propertyKey: string | symbol) => {

@@ -1,5 +1,6 @@
 import { Componenet, IComposable } from "../Composite";
 import { DependencyContainer, Resolved } from "../DependencyInjection";
+import { ICanUpdate } from "../Interfaces";
 import { HTMLTags } from "../types";
 
 export interface IDrawable {
@@ -11,13 +12,11 @@ export interface IDrawable {
 	 * The final output of a component, will be rendered as a DOM element
 	 */
 	Render(): Element;
-
-	Update(): void;
 }
 
 export abstract class DrawableComponent
 	extends Componenet
-	implements IDrawable, IComposable
+	implements IDrawable, IComposable, ICanUpdate
 {
 	declare Parent: DrawableComponent | undefined;
 	public abstract ComponentName: string;
