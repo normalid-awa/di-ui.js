@@ -19,7 +19,7 @@ jobs:
                   registry-url: "https://registry.npmjs.org"
             - run: npm ci
             - name: Run eslint check
-              working-directory: ./workspaces/lib
+              working-directory: ./workspaces/core
               run: npm run lint
     test:
         name: Unit test
@@ -32,7 +32,7 @@ jobs:
                   registry-url: "https://registry.npmjs.org"
             - run: npm ci
             - name: Build
-              working-directory: ./workspaces/lib
+              working-directory: ./workspaces/core
               run: npm run build
             - name: Run unit test
               working-directory: ./workspaces/test

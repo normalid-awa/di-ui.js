@@ -14,9 +14,9 @@ jobs:
               run: |
                   npm ci
             - name: Build
-              working-directory: ./workspaces/lib
+              working-directory: ./workspaces/core
               run: npm run doc
             - name: Deploy 🚀
               uses: JamesIves/github-pages-deploy-action@v4
               with:
-                  folder: workspaces/lib/docs # The folder the action should deploy.
+                  folder: workspaces/core/docs # The folder the action should deploy.
