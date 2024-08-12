@@ -62,10 +62,25 @@ type DependenciesMappedType = {
 //WARN: Not sure this is appropriate to exsite in here
 // This code must be refactor in the near future, for now it is ok
 // As long as the development, this will become a huge tech debt.
+/**
+ * The dependency tree, used by DependencyContainer internally
+ */
 interface IDependencyTree {
+	/**
+	 * parent node
+	 */
 	parent: IDependencyTree | undefined;
+	/**
+	 * children node
+	 */
 	children: IDependencyTree[];
+	/**
+	 * recorded dependency
+	 */
 	dependencies: DependenciesMappedType;
+	/**
+	 * the mirror of current node
+	 */
 	target: IComposable;
 }
 
@@ -198,7 +213,7 @@ export class DependencyContainer implements IDependencyContainer {
 	}
 
 	/**
-	 * Build the dependency from the `injectedTargetRoot`
+	 * Build the dependency from the root
 	 * @returns the generated tree
 	 */
 	protected buildDependencyTree(): IDependencyTree {

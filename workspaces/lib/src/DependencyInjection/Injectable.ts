@@ -51,7 +51,7 @@ export function Resolved(
 
 /**
  * Apply to the property that can provide dependency to its children
- * @since WARN: if you want to provide a method, you must write it as arrow function to so that the `this` won't change when inject
+ * @remarks if you want to provide a method, you must write it as arrow function to so that the `this` won't change when inject
  * @see Resolved
  * @param injectKey The index of the dependency
  * @example
