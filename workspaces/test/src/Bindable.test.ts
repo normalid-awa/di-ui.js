@@ -1,5 +1,5 @@
 import { expect, test, vi } from "vitest";
-import { Bindable, IValueChangedEvent } from "di-ui.js";
+import { Bindable, IValueChangedEvent } from "@di-ui.js/core";
 
 test("Test Bindable Value", () => {
 	const bind = new Bindable<number>(0);

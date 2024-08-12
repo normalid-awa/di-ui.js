@@ -3,7 +3,7 @@ import {
 	DrawableComponent,
 	Framework,
 	SpaAppEntry,
-} from "di-ui.js";
+} from "@di-ui.js/core";
 import { TodoListContainer } from "./TodoListContainer"
 
 class AppRoot extends DrawableComponent {

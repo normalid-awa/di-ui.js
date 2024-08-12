@@ -1,4 +1,4 @@
-import { AppEntry, DependencyContainer, DrawableComponent, IDependencyContainer, IDrawable } from "di-ui.js";
+import { AppEntry, DependencyContainer, DrawableComponent, IDependencyContainer, IDrawable } from "@di-ui.js/core";
 
 export class DummyAppEntry extends AppEntry {
 	protected rootComponenet: IDrawable;

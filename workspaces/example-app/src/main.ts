@@ -9,9 +9,9 @@ import {
 	IInjectable,
 	Resolved,
 	SpaAppEntry,
-} from "di-ui.js";
+} from "@di-ui.js/core";
 
-import type { IBindable } from "di-ui.js";
+import type { IBindable } from "@di-ui.js/core";
 
 // Setup the dependency key, just like indexing
 const FirstWordDependency: unique symbol = Symbol("FirstWordDependency");

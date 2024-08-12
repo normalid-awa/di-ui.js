@@ -1,5 +1,5 @@
 import { expect, test, vi } from "vitest";
-import { Cached, DependencyContainer, IInjectable, Resolved } from "di-ui.js";
+import { Cached, DependencyContainer, IInjectable, Resolved } from "@di-ui.js/core";
 import { DummyDivContainer } from "./helper";
 
 test("Test Dependency Container Provide/Resolved", () => {

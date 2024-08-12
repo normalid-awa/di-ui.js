@@ -1,4 +1,4 @@
-import { Cached, DrawableComponent, Resolved } from "di-ui.js";
+import { Cached, DrawableComponent, Resolved } from "@di-ui.js/core";
 import {
 	DeleteItemDependencyKey,
 	ToggleItemCompleteDependencyKey,

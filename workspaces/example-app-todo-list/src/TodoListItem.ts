@@ -1,4 +1,4 @@
-import { Cached, DrawableComponent, IInjectable, Resolved } from "di-ui.js";
+import { Cached, DrawableComponent, IInjectable, Resolved } from "@di-ui.js/core";
 
 const ToggleCompleteCallbackDependencyKey = Symbol(
 	"CompleteCallbackDependencyKey"

@@ -1,6 +1,6 @@
 import { expect, test } from "vitest";
 import { CreateDummyAppEntry } from "./helper";
-import { Framework } from "di-ui.js";
+import { Framework } from "@di-ui.js/core";
 
 test("Test Framework Render", () => {
 	const app_entry = CreateDummyAppEntry();
