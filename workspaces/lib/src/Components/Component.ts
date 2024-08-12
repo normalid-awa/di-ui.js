@@ -1,4 +1,5 @@
 import { Componenet, IComposable } from "../Composite";
+import { DependencyContainer, Resolved } from "../DependencyInjection";
 import { HTMLTags } from "../types";
 
 export interface IDrawable {
@@ -26,6 +27,9 @@ export abstract class DrawableComponent
 
 	protected abstract CurrentElement?: Element;
 
+	@Resolved(() => DependencyContainer)
+	private readonly dic: DependencyContainer | undefined;
+
 	public Render(): Element {
 		this.IsAlive = true;
 		this.CurrentElement = document.createElement(this.ElementTag);
@@ -44,8 +48,9 @@ export abstract class DrawableComponent
 
 	Update(): void {
 		if (this.IsAlive) {
-			this.CurrentElement?.replaceWith(this.Render())	
+			this.CurrentElement?.replaceWith(this.Render());
 		} else this.CurrentElement?.remove();
+		if (this.dic) this.dic.ResolveDependencyFromRoot();
 	}
 
 	override Add(item: IComposable | IComposable[]): this {
