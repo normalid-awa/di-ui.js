@@ -197,6 +197,10 @@ export class DependencyContainer implements IDependencyContainer {
 		return dependency_tree;
 	}
 
+	/**
+	 * Build the dependency from the `injectedTargetRoot`
+	 * @returns the generated tree
+	 */
 	protected buildDependencyTree(): IDependencyTree {
 		const dependency_tree =
 			this.transformCompositeComponentIntoDependencyTree(

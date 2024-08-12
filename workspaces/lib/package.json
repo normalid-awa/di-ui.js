@@ -48,6 +48,7 @@
 		"test": "echo \"Error: no test specified\" && exit 1",
 		"lint": "eslint .",
 		"dev": "vite build --watch",
-		"build": "vite build"
+		"build": "vite build",
+		"doc": "typedoc src/index.ts"
 	}
 }
