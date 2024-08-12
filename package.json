@@ -2,7 +2,7 @@
 	"name": "@di-ui.js/monorepo",
 	"private": true,
 	"author": "normalid",
-	"version": "1.6.1",
+	"version": "1.6.2",
 	"description": "The new era of front-end framework",
 	"homepage": "https://github.com/normalid-awa/di-ui.js",
 	"type": "module",
@@ -28,7 +28,6 @@
 		"typescript-eslint": "^8.0.0",
 		"vite": "^5.3.5",
 		"vite-plugin-dts": "^4.0.0-beta.2"
-		
 	},
 	"dependencies": {
 		"reflect-metadata": "^0.2.2"
