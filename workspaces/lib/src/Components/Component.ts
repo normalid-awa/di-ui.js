@@ -4,81 +4,81 @@ import { ICanUpdate } from "../Interfaces";
 import { HTMLTags } from "../types";
 
 export interface IDrawable {
-	readonly ComponentName: string;
+	readonly componentName: string;
 
-	IsAlive: boolean;
+	isAlive: boolean;
 
 	/**
 	 * The final output of a component, will be rendered as a DOM element
 	 */
-	Render(): Element;
+	render(): Element;
 }
 
 export abstract class DrawableComponent
 	extends Componenet
 	implements IDrawable, IComposable, ICanUpdate
 {
-	declare Parent: DrawableComponent | undefined;
-	public abstract ComponentName: string;
-	protected abstract readonly ElementTag: NoInfer<HTMLTags>;
-	protected readonly ElementAttributes: Map<string, string> = new Map();
-	IsAlive: boolean = false;
+	declare parent: DrawableComponent | undefined;
+	public abstract componentName: string;
+	protected abstract readonly elementTag: NoInfer<HTMLTags>;
+	protected readonly elementAttributes: Map<string, string> = new Map();
+	isAlive: boolean = false;
 
-	protected abstract CurrentElement?: Element;
+	protected abstract currentElement?: Element;
 
 	@Resolved(() => DependencyContainer)
 	private readonly dic: DependencyContainer | undefined;
 
-	public Render(): Element {
-		this.IsAlive = true;
-		this.CurrentElement = document.createElement(this.ElementTag);
+	public render(): Element {
+		this.isAlive = true;
+		this.currentElement = document.createElement(this.elementTag);
 
-		this.ElementAttributes.forEach((value, key) => {
-			this.CurrentElement!.setAttribute(key, value);
+		this.elementAttributes.forEach((value, key) => {
+			this.currentElement!.setAttribute(key, value);
 		});
 
-		this.Children.forEach((child) => {
+		this.children.forEach((child) => {
 			if (child instanceof DrawableComponent)
-				this.CurrentElement!.appendChild(child.Render());
+				this.currentElement!.appendChild(child.render());
 		});
 
-		return this.CurrentElement;
+		return this.currentElement;
 	}
 
-	Update(): void {
-		if (this.IsAlive) {
-			this.CurrentElement?.replaceWith(this.Render());
-		} else this.CurrentElement?.remove();
-		if (this.dic) this.dic.ResolveDependencyFromRoot();
+	update(): void {
+		if (this.isAlive) {
+			this.currentElement?.replaceWith(this.render());
+		} else this.currentElement?.remove();
+		if (this.dic) this.dic.resolveDependencyFromRoot();
 	}
 
-	override Add(item: IComposable | IComposable[]): this {
-		super.Add(item);
-		this.Update();
+	override add(item: IComposable | IComposable[]): this {
+		super.add(item);
+		this.update();
 		return this;
 	}
 
-	override Remove(item: IComposable | IComposable[]): this {
-		super.Remove(item);
-		this.Update();
+	override remove(item: IComposable | IComposable[]): this {
+		super.remove(item);
+		this.update();
 		return this;
 	}
 
-	override Dispose(): void {
-		super.Dispose();
+	override dispose(): void {
+		super.dispose();
 
-		if (this.CurrentElement) {
-			this.CurrentElement.remove();
+		if (this.currentElement) {
+			this.currentElement.remove();
 		}
-		delete this.CurrentElement;
+		delete this.currentElement;
 
-		this.IsAlive = false;
+		this.isAlive = false;
 
-		this.Update();
+		this.update();
 	}
 
-	public SetAttribute(key: string, value: string): this {
-		this.ElementAttributes.set(key, value);
+	public setAttribute(key: string, value: string): this {
+		this.elementAttributes.set(key, value);
 		return this;
 	}
 }

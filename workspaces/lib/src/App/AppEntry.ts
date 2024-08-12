@@ -2,42 +2,35 @@ import {IDrawable } from "../Components";
 import { Cached, DependencyContainer, IDependencyContainer } from "../DependencyInjection";
 
 export abstract class AppEntry implements IDrawable {
-	IsAlive: boolean = false;
-	public ComponentName: string = "App";
-	protected abstract RootComponenet: IDrawable;
-	
-	@Cached(() => DependencyContainer)
-	protected Container: IDependencyContainer;
+	isAlive: boolean = false;
+	public componentName: string = "App";
+	protected abstract rootComponenet: IDrawable;
+	protected container: IDependencyContainer;
 
 	constructor(diContainer: IDependencyContainer) {
-		this.Container = diContainer;
-	}
-	
-	Update(): void {
-		this.Container.ResolveDependencyFromRoot();
+		this.container = diContainer;
 	}
 
-
-	public Render(): Element {
-		this.IsAlive = true;
-		this.Container.ResolveDependencyFromRoot();
-		return this.RootComponenet.Render();
+	public render(): Element {
+		this.isAlive = true;
+		this.container.resolveDependencyFromRoot();
+		return this.rootComponenet.render();
 	}
 }
 
 export class SpaAppEntry extends AppEntry {
-	public override ComponentName: string = "SpaApp";
-	protected override RootComponenet: IDrawable;
+	public override componentName: string = "SpaApp";
+	protected override rootComponenet: IDrawable;
 
 	public constructor(
 		diContainer: IDependencyContainer,
 		root: IDrawable
 	) {
 		super(diContainer);
-		this.RootComponenet = root;
+		this.rootComponenet = root;
 	}
 
-	override Render(): Element {
-		return super.Render();
+	override render(): Element {
+		return super.render();
 	}
 }

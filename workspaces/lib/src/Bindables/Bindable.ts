@@ -9,29 +9,29 @@ export class CouldNotSetValueToAbindedBindableError extends Error {
 }
 
 export interface IValueChangedEvent<T> {
-	OldValue: T;
-	NewValue: T;
+	oldValue: T;
+	newValue: T;
 }
 
 export type ValueChangedCallback<T> = (event: IValueChangedEvent<T>) => unknown;
 
 export interface IBindable<T> extends IHasDefaultValue<T> {
-	Value: T;
-	readonly BindTarget?: IBindable<T>;
-	BindTo(target: IBindable<T>): void;
-	OnValueChanged(
+	value: T;
+	readonly bindTarget?: IBindable<T>;
+	bindTo(target: IBindable<T>): void;
+	onValueChanged(
 		callback: ValueChangedCallback<T>,
 		runImmediately?: boolean
 	): void;
-	OnDefaultValueChanged(
+	onDefaultValueChanged(
 		callback: ValueChangedCallback<T>,
 		runImmediately?: boolean
 	): void;
 	/**
 	 * Will unbind from BindTarget
 	 */
-	Unbind(): void;
-	CopyTo(target: IBindable<T>): void;
+	unbind(): void;
+	copyTo(target: IBindable<T>): void;
 }
 
 export class Bindable<T> implements IBindable<T> {
@@ -43,99 +43,99 @@ export class Bindable<T> implements IBindable<T> {
 	private readonly bindTargetId: number = -1;
 	private isEditableCopy: boolean = false;
 
-	private defaultValue: T;
-	get DefaultValue(): T {
-		return this.defaultValue;
+	#defaultValue: T;
+	get defaultValue(): T {
+		return this.#defaultValue;
 	}
-	set DefaultValue(newValue: T) {
-		if (this.defaultValue === newValue) return;
-		this.triggerDefaultValueChangedEvent(this.defaultValue, newValue);
-		this.defaultValue = newValue;
-	}
-
-	private bindTarget?: Bindable<T>;
-	get BindTarget(): IBindable<T> | undefined {
-		return this.bindTarget;
+	set defaultValue(newValue: T) {
+		if (this.#defaultValue === newValue) return;
+		this.triggerDefaultValueChangedEvent(this.#defaultValue, newValue);
+		this.#defaultValue = newValue;
 	}
 
-	private value: T;
-	get Value(): T {
-		return this.value;
+	#bindTarget?: Bindable<T>;
+	get bindTarget(): IBindable<T> | undefined {
+		return this.#bindTarget;
 	}
-	set Value(newValue: T) {
-		if (this.BindTarget && !this.isEditableCopy)
+
+	#value: T;
+	get value(): T {
+		return this.#value;
+	}
+	set value(newValue: T) {
+		if (this.bindTarget && !this.isEditableCopy)
 			throw new CouldNotSetValueToAbindedBindableError();
-		if (this.BindTarget && this.isEditableCopy) {
-			this.BindTarget.Value = newValue;
+		if (this.bindTarget && this.isEditableCopy) {
+			this.bindTarget.value = newValue;
 			return;
 		}
-		if (this.value === newValue) return;
-		this.triggerValueChangeEvent(this.value, newValue);
-		this.value = newValue;
+		if (this.#value === newValue) return;
+		this.triggerValueChangeEvent(this.#value, newValue);
+		this.#value = newValue;
 	}
 
 	constructor(defaultValue: T) {
-		this.defaultValue = defaultValue;
-		this.value = defaultValue;
+		this.#defaultValue = defaultValue;
+		this.#value = defaultValue;
 	}
 
 	private triggerValueChangeEvent(oldVal: T, newVal: T): void {
 		this.valueChangedCallbackFunctions.forEach((fn) => {
 			fn({
-				OldValue: oldVal,
-				NewValue: newVal,
+				oldValue: oldVal,
+				newValue: newVal,
 			});
 		});
 
 		this.bindings.forEach((target) => {
-			if (target.BindTarget == this) {
-				target.value = newVal;
+			if (target.bindTarget == this) {
+				target.#value = newVal;
 				target.triggerValueChangeEvent(oldVal, newVal);
-			} else target.Value = newVal;
+			} else target.value = newVal;
 		});
 	}
 
-	OnValueChanged(
+	onValueChanged(
 		callback: ValueChangedCallback<T>,
 		runImmediately: boolean = false,
 	): void {
 		this.valueChangedCallbackFunctions.push(callback);
 		if (runImmediately)
 			callback({
-				OldValue: this.value,
-				NewValue: this.value,
+				oldValue: this.#value,
+				newValue: this.#value,
 			});
 	}
 
 	private triggerDefaultValueChangedEvent(oldVal: T, newVal: T): void {
 		this.defaultValueChangedCallbackFunctions.forEach((fn) => {
 			fn({
-				OldValue: oldVal,
-				NewValue: newVal,
+				oldValue: oldVal,
+				newValue: newVal,
 			});
 		});
 
 		this.bindings.forEach((b) => {
-			b.DefaultValue = newVal;
+			b.defaultValue = newVal;
 		});
 	}
 
-	OnDefaultValueChanged(
+	onDefaultValueChanged(
 		callback: ValueChangedCallback<T>,
 		runImmediately: boolean = false,
 	): void {
 		this.defaultValueChangedCallbackFunctions.push(callback);
 		if (runImmediately) {
 			callback({
-				OldValue: this.defaultValue,
-				NewValue: this.defaultValue,
+				oldValue: this.#defaultValue,
+				newValue: this.#defaultValue,
 			});
 		}
 	}
 
-	CopyTo(target: IBindable<T>): void {
-		target.Value = this.Value;
-		target.DefaultValue = this.DefaultValue;
+	copyTo(target: IBindable<T>): void {
+		target.value = this.value;
+		target.defaultValue = this.defaultValue;
 	}
 
 	protected ReferenceTo(target: Bindable<T>): number {
@@ -146,24 +146,24 @@ export class Bindable<T> implements IBindable<T> {
 		this.bindings.splice(id, 1);
 	}
 
-	BindTo(target: Bindable<T>): void {
-		if (this.BindTarget) this.Unbind();
+	bindTo(target: Bindable<T>): void {
+		if (this.bindTarget) this.unbind();
 
-		target.CopyTo(this);
+		target.copyTo(this);
 		target.ReferenceTo(this);
 
-		this.bindTarget = target;
+		this.#bindTarget = target;
 	}
 
-	Unbind(): void {
-		this.bindTarget?.DereferenceTo(this.bindTargetId);
-		this.bindTarget = undefined;
+	unbind(): void {
+		this.#bindTarget?.DereferenceTo(this.bindTargetId);
+		this.#bindTarget = undefined;
 	}
 
-	GetEditableCopy(): Bindable<T> {
-		const bind = new Bindable<T>(this.defaultValue);
+	getEditableCopy(): Bindable<T> {
+		const bind = new Bindable<T>(this.#defaultValue);
 		bind.isEditableCopy = true;
-		bind.BindTo(this);
+		bind.bindTo(this);
 		return bind;
 	}
 }
