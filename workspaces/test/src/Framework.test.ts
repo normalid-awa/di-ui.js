@@ -8,7 +8,7 @@ test("Test Framework Render", () => {
 	document_root.id = "root";
 	const framework = new Framework(app_entry, document_root);
 
-	expect(void framework.Start());
+	expect(void framework.start());
 
-	expect(document_root.childNodes).contain(app_entry.Render())
+	expect(document_root.childNodes).contain(app_entry.render())
 });

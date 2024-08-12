@@ -1,22 +1,22 @@
 import { AppEntry, DependencyContainer, DrawableComponent, IDependencyContainer, IDrawable } from "di-ui.js";
 
 export class DummyAppEntry extends AppEntry {
-	protected RootComponenet: IDrawable;
-	ComponentName: string = "DummyAppEntry";
+	protected rootComponenet: IDrawable;
+	componentName: string = "DummyAppEntry";
 
 	constructor(dic: IDependencyContainer, root: IDrawable) {
 		super(dic);
-		this.RootComponenet = root;
+		this.rootComponenet = root;
 	}
 }
 
 export class DummyDivContainer extends DrawableComponent {
-	ComponentName: string = "DummyDivContainer";
-	protected ElementTag: keyof HTMLElementTagNameMap = "div";
-	protected CurrentElement?: Element | undefined;	
+	componentName: string = "DummyDivContainer";
+	protected elementTag: keyof HTMLElementTagNameMap = "div";
+	protected currentElement?: Element | undefined;	
 
-	Render(): Element {
-		const element = super.Render();
+	render(): Element {
+		const element = super.render();
 
 		element.append("<h1>Dummy text </h1>")
 

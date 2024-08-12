@@ -17,7 +17,7 @@ export class Framework {
 	/**
 	 * Start the app, and render it on the root
 	 */
-	public Start(): void {
-		this.root.append(this.appEntry.Render());
+	public start(): void {
+		this.root.append(this.appEntry.render());
 	}
 }

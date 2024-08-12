@@ -12,25 +12,25 @@ export const DeleteItemDependencyKey = Symbol("DeleteItemDependencyKey");
 const IsCompletedDependencyKey = Symbol("IsCompletedDependencyKey");
 
 abstract class TodoListActionButton extends DrawableComponent {
-	ComponentName: string = "TodoListActionButton";
-	protected ElementTag: keyof HTMLElementTagNameMap = "button";
-	protected CurrentElement?: HTMLButtonElement | undefined;
+	componentName: string = "TodoListActionButton";
+	protected elementTag: keyof HTMLElementTagNameMap = "button";
+	protected currentElement?: HTMLButtonElement | undefined;
 
 	abstract displayText: string;
 	abstract onClick(): void;
 
-	Render(): Element {
-		super.Render();
-		this.CurrentElement!.title = this.displayText;
-		this.CurrentElement!.innerHTML = this.displayText;
-		this.CurrentElement!.style.float = "right";
-		this.CurrentElement!.onclick = () => this.onClick();
-		return this.CurrentElement!;
+	render(): Element {
+		super.render();
+		this.currentElement!.title = this.displayText;
+		this.currentElement!.innerHTML = this.displayText;
+		this.currentElement!.style.float = "right";
+		this.currentElement!.onclick = () => this.onClick();
+		return this.currentElement!;
 	}
 }
 
 class CompleteButton extends TodoListActionButton implements IInjectable {
-	ComponentName: string = "CompleteButton";
+	componentName: string = "CompleteButton";
 	displayText: string = "Complete";
 
 	@Resolved(ToggleCompleteCallbackDependencyKey)
@@ -39,7 +39,7 @@ class CompleteButton extends TodoListActionButton implements IInjectable {
 	@Resolved(IsCompletedDependencyKey)
 	private isCompleted!: boolean;
 
-	LoadCompleted(): void {
+	loadCompleted(): void {
 		this.displayText = this.isCompleted ? "De-complete" : "Complete";
 	}
 
@@ -49,7 +49,7 @@ class CompleteButton extends TodoListActionButton implements IInjectable {
 }
 
 class DeleteButton extends TodoListActionButton {
-	ComponentName: string = "DeleteButton";
+	componentName: string = "DeleteButton";
 	displayText: string = "Delete";
 
 	@Resolved(DeleteCallbackDependencyKey)
@@ -61,9 +61,9 @@ class DeleteButton extends TodoListActionButton {
 }
 
 export class TodoListItem extends DrawableComponent {
-	ComponentName: string = "TodoListItem";
-	protected ElementTag: keyof HTMLElementTagNameMap = "div";
-	protected CurrentElement?: HTMLDivElement | undefined;
+	componentName: string = "TodoListItem";
+	protected elementTag: keyof HTMLElementTagNameMap = "div";
+	protected currentElement?: HTMLDivElement | undefined;
 
 	index: number;
 
@@ -93,17 +93,17 @@ export class TodoListItem extends DrawableComponent {
 	) {
 		super();
 		this.index = index;
-		this.Add(new CompleteButton()).Add(new DeleteButton());
+		this.add(new CompleteButton()).add(new DeleteButton());
 		this.isCompleted = isCompleted;
 	}
 
-	Render(): Element {
-		super.Render();
-		this.CurrentElement!.style.width = "100%";
-		this.CurrentElement!.style.textDecorationLine = this.isCompleted
+	render(): Element {
+		super.render();
+		this.currentElement!.style.width = "100%";
+		this.currentElement!.style.textDecorationLine = this.isCompleted
 			? "line-through"
 			: "none";
-		this.CurrentElement!.prepend(this.text);
-		return this.CurrentElement!;
+		this.currentElement!.prepend(this.text);
+		return this.currentElement!;
 	}
 }

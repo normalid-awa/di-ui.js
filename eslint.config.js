@@ -61,7 +61,7 @@ export default [
 				{
 					selector: ["classProperty", "classMethod"],
 					modifiers: ["public"],
-					format: ["StrictPascalCase"],
+					format: ["strictCamelCase"],
 				},
 				{
 					selector: ["function"],

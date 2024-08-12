@@ -1,7 +1,7 @@
 export interface IHasDefaultValue<T> {
-	DefaultValue: T;
+	defaultValue: T;
 }
 
 export interface ICanUpdate {
-	Update(): void;
+	update(): void;
 }

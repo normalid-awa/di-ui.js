@@ -3,6 +3,6 @@ import { CreateDummyAppEntry } from "./helper";
 
 test("Test App Entry", () => {
 	const app_entry = CreateDummyAppEntry();
-	expect(app_entry.ComponentName).toBe("DummyAppEntry");
-	expect(app_entry.Render()).instanceOf(Element);
+	expect(app_entry.componentName).toBe("DummyAppEntry");
+	expect(app_entry.render()).instanceOf(Element);
 });

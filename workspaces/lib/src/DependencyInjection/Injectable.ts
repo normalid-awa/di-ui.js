@@ -9,7 +9,7 @@ export interface IInjectable {
 	/**
 	 * Call when the dependency is loaded
 	 */
-	LoadCompleted?(): void;
+	loadCompleted?(): void;
 }
 
 // #region Decorators
@@ -25,9 +25,9 @@ export function Resolved(
 		Reflect.defineMetadata(
 			MetadataKeys.ResolvedProperty,
 			{
-				DependencyKey: injectKey.toString(),
-				Target: target,
-				TargetPropertyKey: propertyKey.toString(),
+				dependencyKey: injectKey.toString(),
+				target: target,
+				targetPropertyKey: propertyKey.toString(),
 			} satisfies InjectablePropertyMetadata,
 			target,
 			propertyKey
@@ -47,9 +47,9 @@ export function Cached(injectKey: string | symbol | Typed): PropertyDecorator {
 		Reflect.defineMetadata(
 			MetadataKeys.CachedProperty,
 			{
-				DependencyKey: injectKey.toString(),
-				Target: target,
-				TargetPropertyKey: propertyKey.toString(),
+				dependencyKey: injectKey.toString(),
+				target: target,
+				targetPropertyKey: propertyKey.toString(),
 			} satisfies InjectablePropertyMetadata,
 			target,
 			propertyKey
@@ -58,12 +58,12 @@ export function Cached(injectKey: string | symbol | Typed): PropertyDecorator {
 }
 
 export abstract class InjectablePropertyMetadata {
-	abstract DependencyKey: string;
+	abstract dependencyKey: string;
 	/**
 	 * The target here is the object not an instance
 	 */
-	abstract Target: Object;
-	abstract TargetPropertyKey: string;
+	abstract target: Object;
+	abstract targetPropertyKey: string;
 }
 
 // #endregion

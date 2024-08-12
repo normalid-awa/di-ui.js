@@ -8,53 +8,53 @@ export interface IComposable {
 	/**
 	 * The parent of this component, undefined means it's the root
 	 */
-	Parent: IComposable | undefined;
+	parent: IComposable | undefined;
 
 	/**
 	 * Contains all child components
 	 */
-	Children: IComposable[];
+	children: IComposable[];
 
 	/**
 	 * Add a new child or children to the component
 	 * @param item
 	 */
-	Add(item: IComposable | IComposable[]): this;
+	add(item: IComposable | IComposable[]): this;
 
 	/**
 	 * Remove a child or children from the component
 	 * @param item
 	 */
-	Remove(item: IComposable | IComposable[]): this;
+	remove(item: IComposable | IComposable[]): this;
 
 	/**
 	 * Detach the component from its parent
 	 */
-	Detach(): void;
+	detach(): void;
 
 	/**
 	 * Dispose this component and all its children
 	 */
-	Dispose(): void;
+	dispose(): void;
 
-	ExtractChildrenToFlatList(): IComposable[];
+	extractChildrenToFlatList(): IComposable[];
 }
 
 export abstract class Componenet implements IComposable {
-	public Parent: IComposable | undefined;
+	public parent: IComposable | undefined;
 
-	public Children: IComposable[];
+	public children: IComposable[];
 
 	constructor() {
-		this.Children = [];
-		this.Parent = undefined;
+		this.children = [];
+		this.parent = undefined;
 	}
 
-	public Add(item: IComposable | IComposable[]): this {
+	public add(item: IComposable | IComposable[]): this {
 		const add = (singleItem: IComposable): void => {
-			singleItem.Detach();
-			singleItem.Parent = this;
-			this.Children.push(singleItem);
+			singleItem.detach();
+			singleItem.parent = this;
+			this.children.push(singleItem);
 		};
 
 		if (Array.isArray(item)) item.forEach((child) => void add(child));
@@ -63,13 +63,13 @@ export abstract class Componenet implements IComposable {
 		return this;
 	}
 
-	public Remove(item: IComposable | IComposable[]): this {
+	public remove(item: IComposable | IComposable[]): this {
 		const remove = (singleItem: IComposable): void => {
-			if (!this.Children.includes(singleItem))
+			if (!this.children.includes(singleItem))
 				throw new ComponentNotFound(JSON.stringify(singleItem));
 
-			const index = this.Children.indexOf(singleItem);
-			this.Children.splice(index, 1);
+			const index = this.children.indexOf(singleItem);
+			this.children.splice(index, 1);
 		};
 
 		if (Array.isArray(item)) item.forEach((child) => void remove(child));
@@ -78,26 +78,26 @@ export abstract class Componenet implements IComposable {
 		return this;
 	}
 
-	public Detach(): void {
-		if (!this.Parent) return;
-		this.Parent.Remove(this);
-		delete this.Parent;
+	public detach(): void {
+		if (!this.parent) return;
+		this.parent.remove(this);
+		delete this.parent;
 	}
 
-	public Dispose(): void {
-		this.Children.forEach((child) => void child.Dispose());
+	public dispose(): void {
+		this.children.forEach((child) => void child.dispose());
 	}
 
-	private extractChildrenToFlatList(children: IComposable[]): IComposable[] {
+	private extractTargetChildrenToFlatList(targetChildren: IComposable[]): IComposable[] {
 		const flat_map: IComposable[] = [];
-		children.forEach((child) => {
+		targetChildren.forEach((child) => {
 			flat_map.push(child);
-			flat_map.push(...this.extractChildrenToFlatList(child.Children));
+			flat_map.push(...this.extractTargetChildrenToFlatList(child.children));
 		});
 		return flat_map;
 	}
 
-	public ExtractChildrenToFlatList(): IComposable[] {
-		return this.extractChildrenToFlatList(this.Children);
+	public extractChildrenToFlatList(): IComposable[] {
+		return this.extractTargetChildrenToFlatList(this.children);
 	}
 }
