@@ -5,6 +5,9 @@ import { MetadataKeys } from "./Metadata";
  */
 export type Typed = () => Object;
 
+/**
+ * Apply to the class that needs a callback when dependency was injected
+ */
 export interface IInjectable {
 	/**
 	 * Call when the dependency is loaded
@@ -14,6 +17,17 @@ export interface IInjectable {
 
 // #region Decorators
 
+/**
+ * Apply to the property that need the dependency
+ * @see Cached
+ * @param injectKey The index of the dependency
+ * @example
+ * \@Resolved("username")
+ * username!: string;
+ *
+ * \@Resolved("register")
+ * register!: (name: string, password: string) => void;
+ */
 export function Resolved(
 	injectKey: string | symbol | Typed
 ): PropertyDecorator {
@@ -36,7 +50,16 @@ export function Resolved(
 }
 
 /**
- * Applicable for the literal value
+ * Apply to the property that can provide dependency to its children
+ * @since WARN: if you want to provide a method, you must write it as arrow function to so that the `this` won't change when inject
+ * @see Resolved
+ * @param injectKey The index of the dependency
+ * @example
+ * \@Cached("username")
+ * username: string;
+ *
+ * \@Cached("register")
+ * register = (name: string, password: string): void => { };
  */
 export function Cached(injectKey: string | symbol | Typed): PropertyDecorator {
 	if (typeof injectKey == "function") {
