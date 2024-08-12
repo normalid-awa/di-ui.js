@@ -8,29 +8,29 @@ import {
 const AddNewTodoItemDependencyKey = Symbol("AddNewTodoItemDependencyKey");
 
 export class TodoListAddButton extends DrawableComponent {
-	ComponentName: string = "TodoListAddButton";
-	protected ElementTag: keyof HTMLElementTagNameMap = "button";
-	protected CurrentElement?: HTMLButtonElement | undefined;
+	componentName: string = "TodoListAddButton";
+	protected elementTag: keyof HTMLElementTagNameMap = "button";
+	protected currentElement?: HTMLButtonElement | undefined;
 
 	@Resolved(AddNewTodoItemDependencyKey)
 	private addItem!: (name: string) => void;
 
-	Render(): Element {
-		super.Render();
-		this.CurrentElement!.textContent = "Add new todo item";
-		this.CurrentElement!.onclick = () => {
+	render(): Element {
+		super.render();
+		this.currentElement!.textContent = "Add new todo item";
+		this.currentElement!.onclick = () => {
 			const result = prompt("Todo item:", "name");
 			if (!result) return;
 			this.addItem(result);
 		};
-		return this.CurrentElement!;
+		return this.currentElement!;
 	}
 }
 
 export class TodoListContainer extends DrawableComponent {
-	ComponentName: string = "TodoListContainer";
-	protected ElementTag: keyof HTMLElementTagNameMap = "div";
-	protected CurrentElement?: HTMLDivElement | undefined;
+	componentName: string = "TodoListContainer";
+	protected elementTag: keyof HTMLElementTagNameMap = "div";
+	protected currentElement?: HTMLDivElement | undefined;
 
 	private todoList: {
 		text: string;
@@ -59,12 +59,12 @@ export class TodoListContainer extends DrawableComponent {
 	};
 
 	refreshTodoList() {
-		this.Children.forEach((v) => v.Dispose());
-		this.Children = this.todoList.map((v, k) => {
+		this.children.forEach((v) => v.dispose());
+		this.children = this.todoList.map((v, k) => {
 			return new TodoListItem(v.text, v.completed, k);
 		});
-		this.Add(new TodoListAddButton());
-		this.Update();
+		this.add(new TodoListAddButton());
+		this.update();
 	}
 
 	constructor() {
@@ -72,14 +72,14 @@ export class TodoListContainer extends DrawableComponent {
 		this.refreshTodoList();
 	}
 
-	Render(): Element {
-		super.Render();
-		this.CurrentElement!.style.textAlign = "center";
-		this.CurrentElement!.style.display = "flex";
-		this.CurrentElement!.style.flexDirection = "column";
-		this.CurrentElement!.style.maxWidth = "400px";
-		this.CurrentElement!.style.margin = "auto";
-		this.CurrentElement!.prepend("Todo list:");
-		return this.CurrentElement!;
+	render(): Element {
+		super.render();
+		this.currentElement!.style.textAlign = "center";
+		this.currentElement!.style.display = "flex";
+		this.currentElement!.style.flexDirection = "column";
+		this.currentElement!.style.maxWidth = "400px";
+		this.currentElement!.style.margin = "auto";
+		this.currentElement!.prepend("Todo list:");
+		return this.currentElement!;
 	}
 }
