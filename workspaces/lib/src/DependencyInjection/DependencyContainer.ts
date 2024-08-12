@@ -66,6 +66,12 @@ export class DependencyContainer implements IDependencyContainer {
 			},
 			Target: injectTargetRoot,
 		};
+		//Provide container itself as a dependency
+		this.Provide(
+			((): typeof DependencyContainer => DependencyContainer)().prototype
+				.constructor.name as string,
+			this
+		);
 	}
 
 	private extractInjectableMetadata(
@@ -207,7 +213,7 @@ export class DependencyContainer implements IDependencyContainer {
 					injectValue
 				);
 			});
-			
+
 			(child.Target as IInjectable).LoadCompleted?.();
 
 			parentDependencies.Cached.forEach((v, k) => {
