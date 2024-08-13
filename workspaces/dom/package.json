@@ -1,0 +1,22 @@
+{
+	"name": "@di-ui.js/dom",
+	"version": "1.0.0",
+	"private": false,
+	"readme": "readme.md",
+	"types": "dist/generated.d.ts",
+	"files": ["dist/**"],
+	"main": "dist/generated.js",
+	"scripts": {
+		"dev": "ts-node-dev --respawn --transpile-only generate.ts",
+		"build": "ts-node --transpile-only generate.ts && tsc dist/generated.ts --declaration "
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"description": "",
+	"devDependencies": {
+		"ts-node": "^10.9.2",
+		"ts-node-dev": "^2.0.0",
+		"typescript": "^5.5.4"
+	}
+}
