@@ -3,31 +3,18 @@ import "reflect-metadata";
 import {
 	Bindable,
 	Cached,
-	DependencyContainer,
-	DrawableComponent,
-	Framework,
+	DependencyContainer, Framework,
 	IInjectable,
 	Resolved,
-	SpaAppEntry,
+	SpaAppEntry
 } from "@di-ui.js/core";
-
-import type { IBindable } from "@di-ui.js/core";
+import { DrawableDivHtmlComponent, DrawableSpanHtmlComponent } from "@di-ui.js/dom";
 
 // Setup the dependency key, just like indexing
 const FirstWordDependency: unique symbol = Symbol("FirstWordDependency");
 const SecondWordDependency: unique symbol = Symbol("SecondWordDependency");
-const ThirdWordDependency: unique symbol = Symbol("ThirdWordDependency");
 
-abstract class Container extends DrawableComponent {
-	protected override elementTag: keyof HTMLElementTagNameMap = "div";
-	override componentName: string = "DivContainer";
-}
-
-class DivContainer extends Container {
-	public override componentName: string = "DivContainer";
-	protected override elementTag: keyof HTMLElementTagNameMap = "div";
-	protected override currentElement?: HTMLDivElement;
-
+class CustomDivContainer extends DrawableDivHtmlComponent {
 	public override render(): Element {
 		super.render();
 		this.currentElement!.style.width = "100vw";
@@ -40,17 +27,15 @@ class DivContainer extends Container {
 	}
 }
 
-class WordWrapper extends DivContainer {
+class WordWrapper extends CustomDivContainer {
 	override componentName: string = "WordWrapper";
 	// You can provide dependency via @Cached, this way the dependency can be retrive by the children
 	@Cached(FirstWordDependency)
 	firstWord: string = "Welcome to the";
 }
 
-abstract class WordContainer extends Container {
+abstract class WordContainer extends DrawableSpanHtmlComponent {
 	public override componentName: string = "WordContainer";
-	protected override elementTag: keyof HTMLElementTagNameMap = "span";
-	protected override currentElement?: HTMLSpanElement;
 
 	protected DisplayText!: string;
 
@@ -104,7 +89,7 @@ class SecondWordComponent extends WordContainer implements IInjectable {
 const documentRoot = document.getElementById("app")!;
 
 // Setup our app root container, children will be added into
-const root = new DivContainer();
+const root = new CustomDivContainer();
 
 const first_word = new FirstWordComponent();
 const second_word = new SecondWordComponent();
