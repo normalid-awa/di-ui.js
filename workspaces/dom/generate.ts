@@ -146,6 +146,6 @@ import { DrawableComponent } from "@di-ui.js/core";
 fs.mkdir("./dist", {
 	recursive: true,
 })
-fs.writeFile("./dist/generated.ts", result, );
+fs.writeFile("./dist/index.ts", result, );
 
 console.log(result);

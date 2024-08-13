@@ -1,18 +1,22 @@
 {
 	"name": "@di-ui.js/dom",
-	"version": "1.0.4",
+	"version": "1.0.5",
 	"private": false,
 	"readme": "readme.md",
-	"files": ["dist/**"],
-	"types": "dist/generated.d.ts",
-	"main": "dist/generated.umd.cjs",
-	"module": "dist/generated.js",
+	"files": [
+		"dist"
+	],
+	"types": "dist/index.d.ts",
+	"main": "dist/index.umd.js",
+	"module": "dist/index.mjs",
 	"exports": {
 		".": {
-			"import": "./dist/generated.mjs",
-			"require": "./dist/generated.umd.cjs"
+			"import": "./dist/index.mjs",
+			"require": "./dist/index.umd.js",
+			"types": "./dist/index.d.ts"
 		}
 	},
+
 	"scripts": {
 		"dev": "ts-node-dev --respawn --transpile-only generate.ts",
 		"build": "ts-node --transpile-only generate.ts && vite build"

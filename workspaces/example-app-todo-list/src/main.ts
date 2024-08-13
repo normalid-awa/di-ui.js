@@ -1,14 +1,12 @@
 import {
 	DependencyContainer,
-	DrawableComponent,
 	Framework,
 	SpaAppEntry,
 } from "@di-ui.js/core";
 import { TodoListContainer } from "./TodoListContainer"
+import { DrawableDivHtmlComponent } from "@di-ui.js/dom"
 
-class AppRoot extends DrawableComponent {
-	protected elementTag: keyof HTMLElementTagNameMap = "div";
-	protected currentElement?: Element | undefined;
+class AppRoot extends DrawableDivHtmlComponent {
 	componentName: string = "AppRoot";
 }
 

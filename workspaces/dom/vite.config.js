@@ -7,10 +7,10 @@ export default defineConfig((env) => {
 	return {
 		build: {
 			lib: {
-				entry: "dist/generated.ts",
+				entry: "dist/index.ts",
 				name: LIB_NAME,
 				formats: ["cjs", "es", "umd", "system"],
-				fileName: "generated",
+				fileName: "index",
 			},
 			outDir: "./dist",
 			minify: !env.isPreview,
