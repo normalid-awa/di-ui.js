@@ -1,10 +1,10 @@
 {
 	"name": "@di-ui.js/dom",
-	"version": "1.0.1",
+	"version": "1.0.2",
 	"private": false,
 	"readme": "readme.md",
 	"files": ["dist/**"],
-	"types": "dist/dist/generated.d.ts",
+	"types": "dist/generated.d.ts",
 	"main": "dist/generated.js",
 	"module": "dist/generated.js",
 	"exports": {

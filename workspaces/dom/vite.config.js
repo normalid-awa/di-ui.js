@@ -12,6 +12,7 @@ export default defineConfig((env) => {
 				formats: ["cjs", "es", "umd", "system"],
 				fileName: "generated",
 			},
+			outDir: "./dist",
 			minify: !env.isPreview,
 		},
 		plugins: [
