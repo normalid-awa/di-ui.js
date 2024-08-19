@@ -42,6 +42,27 @@ export function Resolved(
 				dependencyKey: injectKey.toString(),
 				target: target,
 				targetPropertyKey: propertyKey.toString(),
+				nullable: false,
+			} satisfies InjectablePropertyMetadata,
+			target,
+			propertyKey
+		);
+	};
+}
+
+export function ResolvedNullable(injectKey: string | symbol | Typed): PropertyDecorator {
+	if (typeof injectKey == "function") {
+		// @ts-ignore
+		injectKey = injectKey().prototype.constructor.name as string;
+	}
+	return (target: Object, propertyKey: string | symbol) => {
+		Reflect.defineMetadata(
+			MetadataKeys.ResolvedProperty,
+			{
+				dependencyKey: injectKey.toString(),
+				target: target,
+				targetPropertyKey: propertyKey.toString(),
+				nullable: true,
 			} satisfies InjectablePropertyMetadata,
 			target,
 			propertyKey
@@ -73,6 +94,7 @@ export function Cached(injectKey: string | symbol | Typed): PropertyDecorator {
 				dependencyKey: injectKey.toString(),
 				target: target,
 				targetPropertyKey: propertyKey.toString(),
+				nullable: false,
 			} satisfies InjectablePropertyMetadata,
 			target,
 			propertyKey
@@ -87,6 +109,7 @@ export abstract class InjectablePropertyMetadata {
 	 */
 	abstract target: Object;
 	abstract targetPropertyKey: string;
+	abstract nullable: boolean;
 }
 
 // #endregion
