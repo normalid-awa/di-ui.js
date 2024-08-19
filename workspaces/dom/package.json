@@ -1,6 +1,6 @@
 {
 	"name": "@di-ui.js/dom",
-	"version": "1.0.5",
+	"version": "1.0.6",
 	"private": false,
 	"readme": "readme.md",
 	"files": [
@@ -16,7 +16,6 @@
 			"types": "./dist/index.d.ts"
 		}
 	},
-
 	"scripts": {
 		"dev": "ts-node-dev --respawn --transpile-only generate.ts",
 		"build": "ts-node --transpile-only generate.ts && vite build"
