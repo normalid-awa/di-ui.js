@@ -1,4 +1,8 @@
-import { Cached, DrawableComponent, IInjectable, Resolved } from "@di-ui.js/core";
+import { Cached, IInjectable, Resolved } from "@di-ui.js/core";
+import {
+	DrawableButtonHtmlComponent,
+	DrawableDivHtmlComponent,
+} from "@di-ui.js/dom";
 
 const ToggleCompleteCallbackDependencyKey = Symbol(
 	"CompleteCallbackDependencyKey"
@@ -11,10 +15,8 @@ export const DeleteItemDependencyKey = Symbol("DeleteItemDependencyKey");
 
 const IsCompletedDependencyKey = Symbol("IsCompletedDependencyKey");
 
-abstract class TodoListActionButton extends DrawableComponent {
+abstract class TodoListActionButton extends DrawableButtonHtmlComponent {
 	componentName: string = "TodoListActionButton";
-	protected elementTag: keyof HTMLElementTagNameMap = "button";
-	protected currentElement?: HTMLButtonElement | undefined;
 
 	abstract displayText: string;
 	abstract onClick(): void;
@@ -60,11 +62,8 @@ class DeleteButton extends TodoListActionButton {
 	}
 }
 
-export class TodoListItem extends DrawableComponent {
+export class TodoListItem extends DrawableDivHtmlComponent {
 	componentName: string = "TodoListItem";
-	protected elementTag: keyof HTMLElementTagNameMap = "div";
-	protected currentElement?: HTMLDivElement | undefined;
-
 	index: number;
 
 	@Cached(ToggleCompleteCallbackDependencyKey)

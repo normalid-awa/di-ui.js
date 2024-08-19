@@ -1,16 +1,18 @@
-import { Cached, DrawableComponent, Resolved } from "@di-ui.js/core";
+import { Cached, Resolved } from "@di-ui.js/core";
 import {
 	DeleteItemDependencyKey,
 	ToggleItemCompleteDependencyKey,
 	TodoListItem,
 } from "./TodoListItem";
+import {
+	DrawableButtonHtmlComponent,
+	DrawableDivHtmlComponent,
+} from "@di-ui.js/dom";
 
 const AddNewTodoItemDependencyKey = Symbol("AddNewTodoItemDependencyKey");
 
-export class TodoListAddButton extends DrawableComponent {
+export class TodoListAddButton extends DrawableButtonHtmlComponent {
 	componentName: string = "TodoListAddButton";
-	protected elementTag: keyof HTMLElementTagNameMap = "button";
-	protected currentElement?: HTMLButtonElement | undefined;
 
 	@Resolved(AddNewTodoItemDependencyKey)
 	private addItem!: (name: string) => void;
@@ -27,10 +29,8 @@ export class TodoListAddButton extends DrawableComponent {
 	}
 }
 
-export class TodoListContainer extends DrawableComponent {
+export class TodoListContainer extends DrawableDivHtmlComponent {
 	componentName: string = "TodoListContainer";
-	protected elementTag: keyof HTMLElementTagNameMap = "div";
-	protected currentElement?: HTMLDivElement | undefined;
 
 	private todoList: {
 		text: string;

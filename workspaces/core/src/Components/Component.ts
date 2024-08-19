@@ -41,6 +41,11 @@ export abstract class DrawableComponent
 	@Resolved(() => DependencyContainer)
 	private readonly dic: DependencyContainer | undefined;
 
+	private isDrawable(target: unknown): target is IDrawable {
+		// @ts-ignore-next
+		return typeof target.render === "function" && typeof target.componentName === "string" && typeof target.isAlive === "boolean";
+	}
+
 	public render(): Element {
 		this.isAlive = true;
 		this.currentElement = document.createElement(this.elementTag);
@@ -50,7 +55,7 @@ export abstract class DrawableComponent
 		});
 
 		this.children.forEach((child) => {
-			if (child instanceof DrawableComponent)
+			if (this.isDrawable(child))
 				this.currentElement!.appendChild(child.render());
 		});
 
