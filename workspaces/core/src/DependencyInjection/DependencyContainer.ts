@@ -237,16 +237,20 @@ export class DependencyContainer implements IDependencyContainer {
 				let resolveMetadata: InjectablePropertyMetadata | undefined =
 					parentDependencies.cached.get(resolveTarget.dependencyKey);
 
-				if (resolveMetadata == null)
-					throw new DependencyNotFoundError(
-						resolveTarget.dependencyKey,
-						this.dependencyTree
-					);
+				let injectValue: unknown;
 
-				let injectValue = Reflect.get(
-					resolveMetadata.target,
-					resolveMetadata.targetPropertyKey
-				) as object | undefined;
+				if (resolveMetadata == null)
+					if (resolveTarget.nullable) injectValue = undefined;
+					else
+						throw new DependencyNotFoundError(
+							resolveTarget.dependencyKey,
+							this.dependencyTree
+						);
+				else
+					injectValue = Reflect.get(
+						resolveMetadata.target,
+						resolveMetadata.targetPropertyKey
+					) as object | undefined;
 
 				Reflect.set(
 					child.target,
@@ -291,6 +295,7 @@ export class DependencyContainer implements IDependencyContainer {
 			dependencyKey: key.toString(),
 			target: emulate,
 			targetPropertyKey: "value",
+			nullable: false,
 		});
 		return this;
 	}

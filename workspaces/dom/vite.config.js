@@ -1,5 +1,6 @@
 import { defineConfig } from "vite";
 import dts from "vite-plugin-dts";
+import { externalizeDeps } from "vite-plugin-externalize-deps";
 
 const LIB_NAME = "di-ui";
 
@@ -14,6 +15,9 @@ export default defineConfig((env) => {
 			},
 			outDir: "./dist",
 			minify: !env.isPreview,
+			rollupOptions: {
+				external: ["@di-ui.js/core"]
+			}
 		},
 		plugins: [
 			dts({

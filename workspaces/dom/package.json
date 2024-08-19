@@ -1,6 +1,6 @@
 {
 	"name": "@di-ui.js/dom",
-	"version": "1.0.6",
+	"version": "1.1.0",
 	"private": false,
 	"readme": "readme.md",
 	"files": [
@@ -28,5 +28,8 @@
 		"ts-node": "^10.9.2",
 		"ts-node-dev": "^2.0.0",
 		"typescript": "^5.5.4"
+	},
+	"peerDependencies": {
+		"@di-ui.js/core": "^1.6.5"
 	}
 }

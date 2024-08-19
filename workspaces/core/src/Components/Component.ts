@@ -66,7 +66,7 @@ export abstract class DrawableComponent
 		if (this.isAlive) {
 			this.currentElement?.replaceWith(this.render());
 		} else this.currentElement?.remove();
-		if (this.dic) this.dic.resolveDependencyFromRoot();
+		this.dic?.resolveDependencyFromRoot();
 	}
 
 	override add(item: IComposable | IComposable[]): this {
