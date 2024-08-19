@@ -1,4 +1,4 @@
-import { Cached, Resolved } from "@di-ui.js/core";
+import { Cached, ResolvedNullable } from "@di-ui.js/core";
 import {
 	DeleteItemDependencyKey,
 	ToggleItemCompleteDependencyKey,
@@ -14,8 +14,8 @@ const AddNewTodoItemDependencyKey = Symbol("AddNewTodoItemDependencyKey");
 export class TodoListAddButton extends DrawableButtonHtmlComponent {
 	componentName: string = "TodoListAddButton";
 
-	@Resolved(AddNewTodoItemDependencyKey)
-	private addItem!: (name: string) => void;
+	@ResolvedNullable(AddNewTodoItemDependencyKey)
+	private addItem?: (name: string) => void;
 
 	render(): Element {
 		super.render();
@@ -23,7 +23,7 @@ export class TodoListAddButton extends DrawableButtonHtmlComponent {
 		this.currentElement!.onclick = () => {
 			const result = prompt("Todo item:", "name");
 			if (!result) return;
-			this.addItem(result);
+			this.addItem?.(result);
 		};
 		return this.currentElement!;
 	}
